@@ -8,16 +8,14 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root  # Установите имя пользователя
       MONGO_INITDB_ROOT_PASSWORD: password  # Установите пароль
-    networks:
-      - net
+    network_mode: 'host'
 
   cache:
     container_name: cache_test
     image: 'redis:alpine'
     command: redis-server
     restart: unless-stopped
-    networks:
-      - net
+    network_mode: 'host'
 
   backend:
     container_name: backend_test
