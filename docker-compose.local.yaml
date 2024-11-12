@@ -60,6 +60,7 @@ services:
     volumes:
       - ./nginx/nginx.local.conf:/etc/nginx/nginx.conf
       - ./frontend/dist/:/app
+      - /etc/letsencrypt:/etc/letsencrypt/
     depends_on:
       - backend
     network_mode: 'host'
