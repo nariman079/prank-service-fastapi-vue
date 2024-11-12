@@ -114,7 +114,7 @@ export default {
       formData.append('video', videoBlob, 'video.mp4');
       formData.append('telegram_id', this.telegramId)
       // Отправляем POST-запрос
-      fetch('https://192.168.0.107/api/v1/send_media/', {
+      fetch('http://localhost:8000/api/v1/send_media/', {
         method: 'POST',
         body: formData
       })
