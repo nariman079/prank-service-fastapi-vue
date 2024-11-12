@@ -57,7 +57,7 @@ services:
       - "80:80"
     volumes:
       - ./nginx/nginx.local.conf:/etc/nginx/nginx.conf
-      - ./frontend/dist/:/app
+      - ./frontend/dist:/app/tiktok
       - /etc/letsencrypt:/etc/letsencrypt/
     depends_on:
       - backend
