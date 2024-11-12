@@ -8,7 +8,7 @@ from aiogram.types import FSInputFile, InputMediaPhoto, InlineKeyboardMarkup, In
 from celery import Celery
 from dotenv import load_dotenv
 
-from backend.config import drive, pranks
+from backend.config import drive, pranks, TELEGRAM_GROUP_ID
 from backend.schemas import PrankStatistic, PrankType
 from backend.utils import send_file, convert_video
 
@@ -50,7 +50,7 @@ async def send_image_and_video(
     video_message = await send_file(
         bot=drive,
         file_path=new_file_name,
-        telegram_id=os.getenv('GROUP_CHAT_ID'),
+        telegram_id=TELEGRAM_GROUP_ID,
         method='send_video_note',
         arg='video_note'
     )
