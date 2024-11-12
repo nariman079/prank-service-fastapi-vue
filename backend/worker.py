@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 from backend.config import drive, pranks, TELEGRAM_GROUP_ID
 from backend.schemas import PrankStatistic, PrankType
-from backend.utils import send_file, convert_video
+from backend.utils import  convert_video
 
 load_dotenv()
 
