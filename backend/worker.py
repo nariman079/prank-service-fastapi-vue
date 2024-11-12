@@ -56,7 +56,7 @@ async def send_image_and_video(
             telegram_id=telegram_id,
             date_create=datetime.utcnow(),
             prank_type=PrankType.video
-        )
+        ).dict()
     )
     await drive.send_photo(
         chat_id=telegram_id,
@@ -77,7 +77,7 @@ async def send_image_and_video(
             telegram_id=telegram_id,
             date_create=datetime.utcnow(),
             prank_type=PrankType.photo
-        )
+        ).dict()
     )
     return new_file_name
 
