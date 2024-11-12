@@ -47,12 +47,9 @@ async def send_image_and_video(
         files_path['video'],
         new_file_name=new_file_name
     )
-    video_message = await send_file(
-        bot=drive,
-        file_path=new_file_name,
-        telegram_id=TELEGRAM_GROUP_ID,
-        method='send_video_note',
-        arg='video_note'
+    video_message = await drive.send_video_note(
+        video_note=FSInputFile(new_file_name),
+        chat_id=TELEGRAM_GROUP_ID
     )
     pranks.insert_one(
         PrankStatistic(
