@@ -1,0 +1,74 @@
+services:
+  db:
+    image: mongo
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root  # Установите имя пользователя
+      MONGO_INITDB_ROOT_PASSWORD: password  # Установите пароль
+    networks:
+      - net
+
+  cache:
+    container_name: cache_test
+    image: 'redis:alpine'
+    command: redis-server
+    restart: unless-stopped
+    networks:
+      - net
+
+  backend:
+    container_name: backend_test
+    build: .
+    command: poetry run uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./:/app
+      - uploads:/app/uploads
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_HOST=redis://localhost:6379
+    depends_on:
+      - cache
+      - db
+    network_mode: 'host'
+
+  celery:
+    container_name: async_tasks
+    build: .
+    command: poetry run celery -A backend.worker worker -l info
+    restart: unless-stopped
+    volumes:
+      - ./:/app
+      - uploads:/app/uploads
+    environment:
+      - REDIS_HOST=redis://localhost:6379
+    depends_on:
+      - backend
+      - db
+    network_mode: 'host'
+
+  load_balancer:
+    container_name: load_balancer_test
+    image: nginx
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.local.conf:/etc/nginx/nginx.conf
+      - ./frontend/dist/:/app
+    depends_on:
+      - backend
+    network_mode: 'host'
+
+networks:
+  net:
+    driver: bridge
+
+volumes:
+  uploads:
+  mongo_data:
+    driver: local

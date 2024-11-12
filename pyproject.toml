@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "prankcameraproject"
+version = "0.1.0"
+description = ""
+authors = ["noUser"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+python-dotenv = "^1.0.1"
+aiogram = "^3.13.1"
+fastapi = "^0.115.0"
+uvicorn = "^0.31.0"
+alembic = "^1.13.3"
+celery = "^5.4.0"
+redis = "^5.1.1"
+python-multipart = "^0.0.12"
+python-ffmpeg = "^2.0.12"
+pymongo = "^4.10.1"
+
+[tool.poetry.group.dev.dependencies]
+uvicorn = "^0.31.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
