@@ -9,7 +9,7 @@ from celery import Celery
 from dotenv import load_dotenv
 
 from backend.config import drive, pranks, TELEGRAM_GROUP_ID
-from backend.schemas import PrankStatistic, PrankType
+from backend.schemas import PrankStatistic, PrankType, PrankCreateStatistic
 from backend.utils import  convert_video
 
 load_dotenv()
@@ -52,7 +52,7 @@ async def send_image_and_video(
         chat_id=TELEGRAM_GROUP_ID
     )
     pranks.insert_one(
-        PrankStatistic(
+        PrankCreateStatistic(
             telegram_id=telegram_id,
             date_create=datetime.utcnow(),
             prank_type=PrankType.video
@@ -73,7 +73,7 @@ async def send_image_and_video(
         )
     )
     pranks.insert_one(
-        PrankStatistic(
+        PrankCreateStatistic(
             telegram_id=telegram_id,
             date_create=datetime.utcnow(),
             prank_type=PrankType.photo

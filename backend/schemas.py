@@ -8,6 +8,11 @@ class PrankType(str, Enum):
     video = 'video'
 
 class PrankStatistic(BaseModel):
-    telegram_id: str | int
+    telegram_id: str
+    prank_type: PrankType
+    date_create: datetime
+
+class PrankCreateStatistic(BaseModel):
+    telegram_id: int
     prank_type: PrankType
     date_create: datetime
