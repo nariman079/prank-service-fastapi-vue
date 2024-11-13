@@ -44,7 +44,7 @@ async def send_message_to_telegram(message: str):
     try:
         await drive.send_message(**payload)
     except:
-        print("Не удалось отправить сообщение в Telegram:", e)
+        print("Не удалось отправить сообщение в Telegram:")
 
 @app.middleware("http")
 async def send_response_to_telegram(request: Request, call_next):
