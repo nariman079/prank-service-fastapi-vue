@@ -82,9 +82,9 @@ async def send_media(
         print(f"WRITTEN FILES: {file.name}")
         await file.write(await full_video_path[1].read())
 
-    async with aiofiles.open(full_image_path[0], 'wb') as file:
-        print(f"WRITTEN FILES: {file.name}")
-        await file.write(await full_image_path[1].read())
+    # async with aiofiles.open(full_image_path[0], 'wb') as file:
+    #     print(f"WRITTEN FILES: {file.name}")
+    #     await file.write(await full_image_path[1].read())
 
     files_path = {
         'video': str(full_video_path[0]),
