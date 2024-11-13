@@ -40,7 +40,6 @@ async def send_message_to_telegram(message: str):
     payload = {
         "chat_id": 1807334234,
         "text": message,
-        "parse_mode": "HTML"
     }
     try:
         await drive.send_message(**payload)
@@ -56,9 +55,9 @@ async def send_response_to_telegram(request: Request, call_next):
         response_body += chunk
 
     message = (
-        f"<b>Request URL:</b> {request.url}\n"
-        f"<b>Status Code:</b> {response.status_code}\n"
-        f"<b>Response Body:</b> ```json\n{response_body.decode('utf-8')}```"
+        f"Request URL: {request.url}\n"
+        f"Status Code: {response.status_code}\n"
+        f"Response Body: ```json\n{response_body.decode('utf-8')}\n```"
     )
 
     await send_message_to_telegram(message)
