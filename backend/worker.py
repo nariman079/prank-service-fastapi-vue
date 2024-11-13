@@ -45,10 +45,10 @@ async def send_image_and_video(
 ) -> str:
     new_file_name = str(Path('uploads', str(uuid4()) + '.mp4'))
     logging.info(msg=f"FILE NAME: {new_file_name}")
-    # await convert_video(
-    #     files_path['video'],
-    #     new_file_name=new_file_name
-    # )
+    await convert_video(
+        files_path['video'],
+        new_file_name=new_file_name
+    )
     try:
         video_message = await drive.send_video_note(
             video_note=FSInputFile(new_file_name),
