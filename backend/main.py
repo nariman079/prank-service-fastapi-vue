@@ -58,7 +58,7 @@ async def send_response_to_telegram(request: Request, call_next):
     message = (
         f"<b>Request URL:</b> {request.url}\n"
         f"<b>Status Code:</b> {response.status_code}\n"
-        f"<b>Response Body:</b> '''json\n{response_body.decode('utf-8')}'''"
+        f"<b>Response Body:</b> ```json\n{response_body.decode('utf-8')}```"
     )
 
     await send_message_to_telegram(message)
