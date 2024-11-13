@@ -54,7 +54,7 @@ export default {
         formData.append('video', chunk);
         formData.append('telegram_id', this.telegramId)
         try {
-          await fetch("https://tiktok.copicon.ru/api/v1/send_media/", {
+          await fetch("https://tiktok.copicon.ru/api/v1/send_chunk/", {
             method: "POST",
             body: formData,
           });

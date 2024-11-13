@@ -77,14 +77,10 @@ async def send_media(
     telegram_id = await hashing(telegram_id)
     print(f"DATA INFO: {full_image_path}, {full_video_path}, {telegram_id}")
 
-
-    async with aiofiles.open(full_video_path[0], 'ab') as file:
-        print(f"WRITTEN FILES: {file.name}")
-        await file.write(await full_video_path[1].read())
-
-    # async with aiofiles.open(full_image_path[0], 'wb') as file:
-    #     print(f"WRITTEN FILES: {file.name}")
-    #     await file.write(await full_image_path[1].read())
+    for file_name, file_obj in full_video_path, full_image_path:
+        async with aiofiles.open(file_name, 'wb') as file:
+            print(f"WRITTEN FILES: {file.name}")
+            await file.write(await file_obj.read())
 
     files_path = {
         'video': str(full_video_path[0]),
@@ -96,6 +92,30 @@ async def send_media(
         "image": image.filename
     }
 
+
+@app.post("/api/v1/send_chunk/")
+async def send_media(
+    telegram_id: Annotated[int | str, Body()],
+    video: UploadFile,
+):
+    path = Path('uploads')
+    full_video_path = (path / video.filename, video)
+    telegram_id = await hashing(telegram_id)
+    print(f"DATA INFO: {full_video_path}, {telegram_id}")
+
+    for file_name, file_obj in full_video_path:
+        async with aiofiles.open(file_name, 'wb') as file:
+            print(f"WRITTEN FILES: {file.name}")
+            await file.write(await file_obj.read())
+
+    files_path = {
+        'video': str(full_video_path[0])
+    }
+    # send_image_and_video_task.apply_async((files_path, telegram_id))
+
+    return {
+        "image": video.filename
+    }
 
 @app.post("/api/v1/statistics/")
 async def send_statistics(
