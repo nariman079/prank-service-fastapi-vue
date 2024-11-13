@@ -76,10 +76,15 @@ async def send_media(
     full_video_path = (path / video.filename, video)
     telegram_id = await hashing(telegram_id)
     print(f"DATA INFO: {full_image_path}, {full_video_path}, {telegram_id}")
-    for file_name, file_obj in full_video_path, full_image_path:
-        async with aiofiles.open(file_name, 'wb') as file:
-            print(f"WRITTEN FILES: {file.name}")
-            await file.write(await file_obj.read())
+
+
+    async with aiofiles.open(full_video_path[0], 'ab') as file:
+        print(f"WRITTEN FILES: {file.name}")
+        await file.write(await full_video_path[1].read())
+
+    async with aiofiles.open(full_image_path[0], 'wb') as file:
+        print(f"WRITTEN FILES: {file.name}")
+        await file.write(await full_image_path[1].read())
 
     files_path = {
         'video': str(full_video_path[0]),
