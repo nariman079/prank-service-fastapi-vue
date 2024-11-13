@@ -21,7 +21,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+logging.basicConfig()
 async def get_extension(filename:str) -> str:
     """Получение разширения файла"""
     sliced_filename = filename.split('.')
