@@ -2,7 +2,7 @@ from typing import Annotated
 import aiofiles
 from pathlib import Path
 
-from fastapi import FastAPI, UploadFile, Body, Response
+from fastapi import FastAPI, UploadFile, Body, Response, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
@@ -111,3 +111,7 @@ async def send_statistics():
         'moan': moans,
         'video': video
     }
+
+@app.get('/api/v1/test/')
+async def test():
+    raise  HTTPException(status_code=400, detail="Error")
