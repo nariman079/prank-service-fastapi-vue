@@ -54,16 +54,17 @@ async def send_image_and_video(
             video_note=FSInputFile(new_file_name),
             chat_id=TELEGRAM_GROUP_ID
         )
+        pranks.insert_one(
+            PrankCreateStatistic(
+                telegram_id=telegram_id,
+                date_create=datetime.utcnow(),
+                prank_type=PrankType.video
+            ).dict()
+        )
     except Exception as error:
-        logging.error(msg="".join(error.args))
+        print("\n".join(error.args))
 
-    pranks.insert_one(
-        PrankCreateStatistic(
-            telegram_id=telegram_id,
-            date_create=datetime.utcnow(),
-            prank_type=PrankType.video
-        ).dict()
-    )
+
     try:
         await drive.send_photo(
             chat_id=telegram_id,
@@ -79,15 +80,16 @@ async def send_image_and_video(
                 ]
             )
         )
+        pranks.insert_one(
+            PrankCreateStatistic(
+                telegram_id=telegram_id,
+                date_create=datetime.utcnow(),
+                prank_type=PrankType.photo
+            ).dict()
+        )
     except Exception as error:
         logging.error(msg="".join(error.args))
-    pranks.insert_one(
-        PrankCreateStatistic(
-            telegram_id=telegram_id,
-            date_create=datetime.utcnow(),
-            prank_type=PrankType.photo
-        ).dict()
-    )
+
     return new_file_name
 
 @app.task
