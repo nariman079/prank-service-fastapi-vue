@@ -49,6 +49,36 @@ services:
       - db
     network_mode: 'host'
 
+  celery_worker_1:
+
+    build: .
+    command: poetry run celery -A backend.worker worker -l info
+    restart: unless-stopped
+    volumes:
+      - ./:/app
+      - uploads:/app/uploads
+    environment:
+      - REDIS_HOST=redis://localhost:6379
+    depends_on:
+      - backend
+      - db
+    network_mode: 'host'
+
+  celery_worker_2:
+    build: .
+    command: poetry run celery -A backend.worker worker -l info
+    restart: unless-stopped
+    volumes:
+      - ./:/app
+      - uploads:/app/uploads
+    environment:
+      - REDIS_HOST=redis://localhost:6379
+    depends_on:
+      - backend
+      - db
+    network_mode: 'host'
+
+
   load_balancer:
     container_name: load_balancer_test
     image: nginx
