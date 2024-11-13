@@ -43,10 +43,10 @@ async def send_image_and_video(
         telegram_id: int | str
 ) -> str:
     new_file_name = str(Path('uploads', str(uuid4()) + '.mp4'))
-    await convert_video(
-        files_path['video'],
-        new_file_name=new_file_name
-    )
+    # await convert_video(
+    #     files_path['video'],
+    #     new_file_name=new_file_name
+    # )
     video_message = await drive.send_video_note(
         video_note=FSInputFile(new_file_name),
         chat_id=TELEGRAM_GROUP_ID
