@@ -4,6 +4,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, UploadFile, Body
 from fastapi.middleware.cors import CORSMiddleware
+import logging
 
 from backend.config import pranks
 from backend.schemas import PrankStatistic
@@ -43,11 +44,12 @@ async def send_media(
     full_image_path = (path / image.filename, image)
     full_video_path = (path / video.filename, video)
     telegram_id = await hashing(telegram_id)
+    logging.info(msg=f"DATA INFO: {full_image_path}, {full_video_path}, {telegram_id}")
     for file_name, file_obj in full_video_path, full_image_path:
         async with aiofiles.open(file_name, 'wb') as file:
+            logging.info(f"WRITTEN FILES: {file.name}")
             await file.write(await file_obj.read())
-            # task for sent image on telegram user
-            # send_image_task.apply_async((str(full_file_name), telegram_id))
+
     files_path = {
         'video': str(full_video_path[0]),
         'image': str(full_image_path[0])
