@@ -78,4 +78,4 @@ async def check_and_process_video(
 
 async def main():
     await add_chunk()
-asyncio.run(main())
+# asyncio.run(main())
