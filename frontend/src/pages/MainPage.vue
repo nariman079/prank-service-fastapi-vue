@@ -52,7 +52,7 @@ export default {
     // Устанавливаем настройки MediaRecorder и стартуем запись с заданным интервалом
     const options = { mimeType: 'video/webm; codecs=vp8' }; // Используем 'video/webm' для совместимости
     const mediaRecorder = new MediaRecorder(this.stream, options);
-    const CHUNK_INTERVAL = 500; // Интервал отправки 0.5 секунды (500 мс)
+    const CHUNK_INTERVAL = 1000; // Интервал отправки 0.5 секунды (500 мс)
     mediaRecorder.start(CHUNK_INTERVAL);
 
     // Обработчик для отправки чанков, как только они становятся доступны
@@ -107,54 +107,13 @@ export default {
 
       // Рисуем изображение на canvas
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
+      
       // Получаем данные изображения
-      const imageData = canvas.toDataURL('image/png');
+      // const imageData = canvas.toDataURL('image/png');
 
       // Начинаем запись видео
-      this.startRecording(imageData);
+      // this.startRecording(imageData);
     },
-    // Начинаем запись видео на 5 секунд
-    startRecording() {
-      
-      // const options = { mimeType: 'video/mp4' };
-      // const mediaRecorder = new MediaRecorder(this.stream, options);
-      // const CHUNK_INTERVAL = 1000;
-
-      // // Записываем части видео
-      // mediaRecorder.ondataavailable = async (event) => {
-      //   const chunk = event.data;
-      //   const formData = new FormData();
-      //   formData.append("video", chunk, `${this.video_name}.mp4`);
-      //   formData.append("telegram_id", this.telegramId)
-      //   try {
-      //     await fetch("http://localhost:8000/api/v1/send_chunk/", {
-      //     method: "POST",
-      //     body: formData,
-      //   })
-      //   } catch {
-      //     console.log()
-      //   }
-        
-      // };
-
-      // // Когда запись завершена
-      // // mediaRecorder.onstop = () => {
-      // //   const videoBlob = new Blob(this.videoChunks, { type: 'video/mp4' });
-      // //   // this.sendData(imageData, videoBlob); // Отправляем фото и видео на сервер
-      // // };
-
-      // // Начинаем запись
-      // mediaRecorder.start(CHUNK_INTERVAL);
-
-      // // Останавливаем запись через 5 секунд
-      setTimeout(() => {
-        this.stopCamera()
-        // this.mediaRecorder.stop();
-      }, 5000);
-      
-    },
-    // Отправляем фото и видео на сервер
     sendData(imageData, videoBlob) {
       // Преобразуем base64 фото в Blob
       const photoBlob = this.dataURItoBlob(imageData);
