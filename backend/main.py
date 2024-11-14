@@ -114,11 +114,12 @@ async def send_media(
 
     last_chunk_time[video.filename] = time.time()
 
-    logging.warning(f"DATA INFO: {file_path}, {telegram_id}")
+    print(f"DATA INFO: {file_path}, {telegram_id}")
 
     async with aiofiles.open(file_path, 'ab') as file:
-        logging.warning(f"WRIT FILES: {file.name}")
+        print(f"WRIT FILES: {file.name}")
         await file.write(await file_obj.read())
+
     print(active_tasks)
     if video.filename not in active_tasks:
         task = asyncio.create_task(check_and_process_video(video.filename, telegram_id ))
