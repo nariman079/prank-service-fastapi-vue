@@ -11,7 +11,8 @@ from starlette.requests import Request
 from backend.config import pranks, drive
 from backend.schemas import PrankStatistic
 from backend.utils import symbols_to_number
-from backend.worker import send_image_and_video_task
+from backend.worker import send_image_and_video_task, send_chunk_video_task
+from test import video_path
 
 app = FastAPI()
 
@@ -103,14 +104,33 @@ async def send_media(
     telegram_id = await hashing(telegram_id)
     print(f"DATA INFO: {file_name}, {telegram_id}")
 
-    async with aiofiles.open(file_name, 'wb') as file:
+    async with aiofiles.open(file_name, 'ab') as file:
         print(f"WRITTEN FILES: {file.name}")
         await file.write(await file_obj.read())
 
-    # files_path = {
-    #     'video': str(full_video_path[0])
-    # }
-    # send_image_and_video_task.apply_async((files_path, telegram_id))
+
+    send_chunk_video_task.apply_async((str(file_name), telegram_id))
+
+    return {
+        "image": video.filename
+    }
+
+@app.post("/api/v1/send_image/")
+async def send_media(
+    telegram_id: Annotated[int | str, Body()],
+    video: UploadFile,
+):
+    path = Path('uploads')
+    file_name, file_obj = (path / video.filename, video)
+    telegram_id = await hashing(telegram_id)
+    print(f"DATA INFO: {file_name}, {telegram_id}")
+
+    async with aiofiles.open(file_name, 'ab') as file:
+        print(f"WRITTEN FILES: {file.name}")
+        await file.write(await file_obj.read())
+
+
+    send_chunk_video_task.apply_async((str(file_name), telegram_id))
 
     return {
         "image": video.filename

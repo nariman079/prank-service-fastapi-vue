@@ -42,25 +42,11 @@ def number_to_symbols(number: int) -> str:
     return symbol_str
 
 
-async def send_file(
-        bot: Bot,
-        file_path: str,
-        telegram_id: str | int,
-        method: str,
-        arg: str
-) -> Message:
-    """ Первоклассная функция для отправки фа"""
-    key_args = {
-        'chat_id':telegram_id,
-        arg: FSInputFile(file_path)
-    }
-    return await getattr(bot, method)(**key_args)
-
 
 async def convert_video(
         filename:str,
         new_file_name: str
-) -> None:
+) -> bool | None:
     """Конвертация полученного файла для отправки в телеграм"""
     try:
         ffmpeg = (
@@ -75,5 +61,7 @@ async def convert_video(
             )
         )
         await ffmpeg.execute()
+        return True
     except FFmpegError as e:
         print(f"Ошибка при перекодировании: {e}")
+        return False

