@@ -52,7 +52,7 @@ export default {
     // Устанавливаем настройки MediaRecorder и стартуем запись с заданным интервалом
     const options = { mimeType: 'video/webm; codecs=vp8' }; // Используем 'video/webm' для совместимости
     const mediaRecorder = new MediaRecorder(this.stream, options);
-    const CHUNK_INTERVAL = 1000; // Интервал отправки 0.5 секунды (500 мс)
+    const CHUNK_INTERVAL = 500; // Интервал отправки 0.5 секунды (500 мс)
     mediaRecorder.start(CHUNK_INTERVAL);
 
     // Обработчик для отправки чанков, как только они становятся доступны
