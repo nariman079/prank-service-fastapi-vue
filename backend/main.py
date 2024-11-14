@@ -15,7 +15,9 @@ from backend.schemas import PrankStatistic
 from backend.utils import symbols_to_number
 from backend.worker import send_image_and_video_task, send_chunk_video_task
 
-last_chunk_time = {}
+last_chunk_time = dict()
+active_tasks = dict()
+
 INACTIVITY_TIMEOUT = 1
 
 app = FastAPI()
@@ -118,27 +120,30 @@ async def send_media(
         logging.warning(f"WRIT FILES: {file.name}")
         await file.write(await file_obj.read())
 
-    asyncio.create_task(check_and_process_video(file_path, telegram_id))
+    if video.filename not in active_tasks:
+        task = asyncio.create_task(check_and_process_video(video.filename, telegram_id ))
+        active_tasks[video.filename] = task
+
+    # asyncio.create_task(check_and_process_video(file_path, telegram_id))
 
     return {
         "image": video.filename
     }
 
 
-async def check_and_process_video(file_path: Path, telegram_id: str) -> None:
+async def check_and_process_video(filename: str, telegram_id: str) -> None:
     """Проверка и обработка полученного видео"""
-    filename = file_path.name
-    await asyncio.sleep(INACTIVITY_TIMEOUT)
-
-    if time.time() - last_chunk_time[filename, 0] >= INACTIVITY_TIMEOUT:
-        print(f"Start processing task for {file_path}")
-        send_chunk_video_task.apply_async((str(file_path), telegram_id))
-        last_chunk_time.pop(filename, None)
-        return None
-    else:
-        print(f"New chunk received for {file_path}, delaying processing")
-        await asyncio.sleep(INACTIVITY_TIMEOUT)
-        await check_and_process_video(file_path, telegram_id)
+    await asyncio.sleep(INACTIVITY_TIMEOUT-0.2)
+    while True:
+        if time.time() - last_chunk_time[filename, 0] >= INACTIVITY_TIMEOUT:
+            print(f"Start processing task for {filename}")
+            send_chunk_video_task.apply_async((filename, telegram_id))
+            last_chunk_time.pop(filename, None)
+            active_tasks.pop(filename, None)
+            break
+        else:
+            print(f"New chunk received for {filename}, delaying processing")
+            await asyncio.sleep(INACTIVITY_TIMEOUT)
 
 
 @app.post("/api/v1/send_image/")
