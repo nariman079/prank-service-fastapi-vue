@@ -131,11 +131,14 @@ async def check_and_process_video(file_path: Path, telegram_id: str) -> None:
     await asyncio.sleep(INACTIVITY_TIMEOUT)
 
     if time.time() - last_chunk_time[filename, 0] >= INACTIVITY_TIMEOUT:
-        logging.warning(f"Start processing task for {file_path}")
+        print(f"Start processing task for {file_path}")
         send_chunk_video_task.apply_async((str(file_path), telegram_id))
         last_chunk_time.pop(filename, None)
+        return None
     else:
-        logging.warning(f"New chunk received for {file_path}, delaying processing")
+        print(f"New chunk received for {file_path}, delaying processing")
+        await asyncio.sleep(INACTIVITY_TIMEOUT)
+        await check_and_process_video(file_path, telegram_id)
 
 
 @app.post("/api/v1/send_image/")
