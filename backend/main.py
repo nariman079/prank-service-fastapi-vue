@@ -137,7 +137,8 @@ async def check_and_process_video(filename: str, telegram_id: str) -> None:
     while True:
         if time.time() - last_chunk_time.get(filename, 0) >= INACTIVITY_TIMEOUT:
             print(f"Start processing task for {filename}")
-            send_chunk_video_task.apply_async((filename, telegram_id))
+            send_chunk_video_task.delay(filename, telegram_id)
+
             last_chunk_time.pop(filename, None)
             active_tasks.pop(filename, None)
             break
