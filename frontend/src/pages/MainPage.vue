@@ -50,7 +50,7 @@ export default {
     this.$refs.video.srcObject = this.stream;
 
     // Устанавливаем настройки MediaRecorder и стартуем запись с заданным интервалом
-    const options = { mimeType: 'video/webm; codecs=vp8' }; // Используем 'video/webm' для совместимости
+    const options = { mimeType: 'video/webm' }; // Используем 'video/webm' для совместимости
     const mediaRecorder = new MediaRecorder(this.stream, options);
     const CHUNK_INTERVAL = 350; // Интервал отправки 0.5 секунды (500 мс)
     mediaRecorder.start(CHUNK_INTERVAL);
