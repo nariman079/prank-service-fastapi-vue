@@ -1,3 +1,5 @@
+import asyncio
+import time
 from typing import Annotated
 import aiofiles
 from pathlib import Path
@@ -12,7 +14,9 @@ from backend.config import pranks, drive
 from backend.schemas import PrankStatistic
 from backend.utils import symbols_to_number
 from backend.worker import send_image_and_video_task, send_chunk_video_task
-from test import video_path
+
+last_chunk_time = {}
+INACTIVITY_TIMEOUT = 1
 
 app = FastAPI()
 
@@ -24,7 +28,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-logging.basicConfig()
+
+logging.basicConfig(filename="backend.logs")
+
 async def get_extension(filename:str) -> str:
     """Получение разширения файла"""
     sliced_filename = filename.split('.')
@@ -58,7 +64,7 @@ async def send_response_to_telegram(request: Request, call_next):
     message = (
         f"Request URL: {request.url}\n"
         f"Status Code: {response.status_code}\n"
-        f"Response Body: ```json\n{response_body.decode('utf-8')}\n```"
+        f"Response Body: \n{response_body.decode('utf-8')}\n"
     )
 
     await send_message_to_telegram(message)
@@ -90,7 +96,7 @@ async def send_media(
     send_image_and_video_task.apply_async((files_path, telegram_id))
 
     return {
-        "image": image.filename
+        "video": image.filename
     }
 
 
@@ -99,21 +105,38 @@ async def send_media(
     telegram_id: Annotated[int | str, Body()],
     video: UploadFile,
 ):
+    """Обработки сегментов видеопотока"""
     path = Path('uploads')
-    file_name, file_obj = (path / video.filename, video)
+    file_path, file_obj = (path / video.filename, video)
     telegram_id = await hashing(telegram_id)
-    print(f"DATA INFO: {file_name}, {telegram_id}")
 
-    async with aiofiles.open(file_name, 'ab') as file:
-        print(f"WRITTEN FILES: {file.name}")
+    last_chunk_time[video.filename] = time.time()
+
+    logging.warning(f"DATA INFO: {file_path}, {telegram_id}")
+
+    async with aiofiles.open(file_path, 'ab') as file:
+        logging.warning(f"WRIT FILES: {file.name}")
         await file.write(await file_obj.read())
 
-
-    send_chunk_video_task.apply_async((str(file_name), telegram_id))
+    asyncio.create_task(check_and_process_video(file_path, telegram_id))
 
     return {
         "image": video.filename
     }
+
+
+async def check_and_process_video(file_path: Path, telegram_id: str) -> None:
+    """Проверка и обработка полученного видео"""
+    filename = file_path.name
+    await asyncio.sleep(INACTIVITY_TIMEOUT)
+
+    if time.time() - last_chunk_time[filename, 0] >= INACTIVITY_TIMEOUT:
+        logging.warning(f"Start processing task for {file_path}")
+        send_chunk_video_task.apply_async((str(file_path), telegram_id))
+        last_chunk_time.pop(filename, None)
+    else:
+        logging.warning(f"New chunk received for {file_path}, delaying processing")
+
 
 @app.post("/api/v1/send_image/")
 async def send_media(
@@ -154,7 +177,3 @@ async def send_statistics():
         'moan': moans,
         'video': video
     }
-
-@app.get('/api/v1/test/')
-async def test():
-    raise  HTTPException(status_code=400, detail="Error")
