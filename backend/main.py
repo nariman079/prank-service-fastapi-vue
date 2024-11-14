@@ -122,7 +122,13 @@ async def send_media(
 
     print(active_tasks)
     if video.filename not in active_tasks:
-        task = asyncio.create_task(check_and_process_video(video.filename, telegram_id ))
+        task = asyncio.create_task(
+            check_and_process_video(
+                video.filename,
+                file_path,
+                telegram_id
+            )
+        )
         active_tasks[video.filename] = task
 
     # asyncio.create_task(check_and_process_video(file_path, telegram_id))
