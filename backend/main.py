@@ -132,13 +132,17 @@ async def send_media(
     }
 
 
-async def check_and_process_video(filename: str, telegram_id: str) -> None:
+async def check_and_process_video(
+        filename: str,
+        file_path: Path,
+        telegram_id: str
+) -> None:
     """Проверка и обработка полученного видео"""
     await asyncio.sleep(INACTIVITY_TIMEOUT - 0.2)
     while True:
         if time.time() - last_chunk_time.get(filename, 0) >= INACTIVITY_TIMEOUT:
             print(f"Start processing task for {filename}")
-            send_chunk_video_task.delay(filename, telegram_id)
+            send_chunk_video_task.delay(str(file_path), telegram_id)
             print(f"End processing task for {filename}")
             print(last_chunk_time, active_tasks)
             last_chunk_time.pop(filename, None)
