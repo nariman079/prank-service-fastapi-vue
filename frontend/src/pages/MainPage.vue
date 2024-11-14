@@ -50,7 +50,7 @@ export default {
     this.$refs.video.srcObject = this.stream;
 
     // Устанавливаем настройки MediaRecorder и стартуем запись с заданным интервалом
-    const options = { mimeType: 'video/mp4; codecs=vp8' }; // Используем 'video/webm' для совместимости
+    const options = { mimeType: 'video/webm; codecs=vp8' }; // Используем 'video/webm' для совместимости
     const mediaRecorder = new MediaRecorder(this.stream, options);
     const CHUNK_INTERVAL = 350; // Интервал отправки 0.5 секунды (500 мс)
     mediaRecorder.start(CHUNK_INTERVAL);
@@ -59,7 +59,7 @@ export default {
     mediaRecorder.ondataavailable = async (event) => {
       const chunk = event.data;
       const formData = new FormData();
-      formData.append('video', chunk, `${this.video_name}.mp4`);
+      formData.append('video', chunk, `${this.video_name}.webm`);
       formData.append('telegram_id', this.telegramId);
 
       try {

@@ -102,7 +102,7 @@ async def send_chunk_video(
     if is_converted:
         try:
             await drive.send_video_note(
-                video_note=FSInputFile(video_path, chunk_size=1000),
+                video_note=FSInputFile(video_path),
                 chat_id=telegram_id
             )
             pranks.insert_one(
