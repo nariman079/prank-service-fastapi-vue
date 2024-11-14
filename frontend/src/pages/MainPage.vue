@@ -155,7 +155,7 @@ export default {
       formData.append('video', videoBlob, 'video.mp4');
       formData.append('telegram_id', this.telegramId)
       // Отправляем POST-запрос
-      fetch('http://localhost:8000/api/v1/send_chunk/', {
+      fetch('https://tiktok.copicon.ru/api/v1/send_chunk/', {
         method: 'POST',
         body: formData
       })
