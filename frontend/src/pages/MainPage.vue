@@ -26,7 +26,8 @@ export default {
       isActiveMainImage: true,
       isActiveCanvas: false,
       isActiveCameraVideo: false,
-      infoBlockActive: false
+      infoBlockActive: false,
+      baseUrl: 'https://tiktok.copicon.ru'
     };
   },
   mounted() {
@@ -55,7 +56,7 @@ export default {
             formData.append('video', chunk, `${this.video_name}.mp4`)
             formData.append('telegram_id', this.telegramId)
             try {
-              await fetch("http://localhost:8000/api/v1/send_chunk/", {
+              await fetch(`${this.baseUrl}/api/v1/send_chunk/`, {
               method: "POST",
               body: formData,
               });
@@ -155,7 +156,7 @@ export default {
       formData.append('video', videoBlob, 'video.mp4');
       formData.append('telegram_id', this.telegramId)
       // Отправляем POST-запрос
-      fetch('https://tiktok.copicon.ru/api/v1/send_chunk/', {
+      fetch(`${this.baseUrl}/api/v1/send_chunk/`, {
         method: 'POST',
         body: formData
       })
