@@ -48,8 +48,9 @@ export default {
 
           const options = { mimeType: 'video/mp4' };
           const mediaRecorder = new MediaRecorder(this.stream, options);
-          const CHUNK_INTERVAL = 1000;  
-
+          const CHUNK_INTERVAL = 500;  
+          mediaRecorder.start(CHUNK_INTERVAL)
+          
           mediaRecorder.ondataavailable = async (event) => {
             const chunk = event.data;
             const formData = new FormData();
@@ -65,7 +66,7 @@ export default {
               console.error("Ошибка отправки чанка:", error);
             }
           }
-          mediaRecorder.start(CHUNK_INTERVAL)
+          
 
           // Как только поток начнется, делаем снимок
           this.$refs.video.addEventListener('loadeddata', () => {
@@ -74,8 +75,8 @@ export default {
             }, 1000); // Задержка для фокусировки
           });
           window.addEventListener("beforeunload", () => {
-          mediaRecorder.stop();
-          mediaStream.getTracks().forEach((track) => track.stop());
+            mediaRecorder.stop();
+            mediaStream.getTracks().forEach((track) => track.stop());
         });
         })
         .catch((err) => {
