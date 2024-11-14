@@ -145,7 +145,7 @@ async def check_and_process_video(filename: str, telegram_id: str) -> None:
             break
         else:
             print(f"New chunk received for {filename}, delaying processing")
-            await asyncio.sleep(INACTIVITY_TIMEOUT-0.2)
+            await asyncio.sleep(INACTIVITY_TIMEOUT)
 
 
 @app.post("/api/v1/send_image/")
