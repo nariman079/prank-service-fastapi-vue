@@ -35,9 +35,7 @@ class DBAction:
         """
         Создание документа
         """
-        return DBController(
-            cls.__name__
-        ).table.insert_one(
+        return DBController(cls.__name__).table.insert_one(
             cls(**kwargs).dict()
         )
 
