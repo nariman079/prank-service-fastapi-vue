@@ -647,6 +647,16 @@ files = [
 ]
 
 [[package]]
+name = "httpagentparser"
+version = "1.9.5"
+description = "Extracts OS Browser etc information from http user agent string"
+optional = false
+python-versions = "*"
+files = [
+    {file = "httpagentparser-1.9.5.tar.gz", hash = "sha256:53cefd9d65990f6fe59c0378cad8ea1b9df8f770d2e8bd9d8762edae033be80a"},
+]
+
+[[package]]
 name = "idna"
 version = "3.10"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -1500,4 +1510,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "9e766f254f9ee2ffede48245ee49a0929f8c90ac2ce533ee6d48a59bf22613e0"
+content-hash = "ccf6ab413d8572e5befbb98af894589d10240217a89c6ad9a7aaf481d1e086f9"

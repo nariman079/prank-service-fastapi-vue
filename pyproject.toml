@@ -17,6 +17,7 @@ redis = "^5.1.1"
 python-multipart = "^0.0.12"
 python-ffmpeg = "^2.0.12"
 pymongo = "^4.10.1"
+httpagentparser = "^1.9.5"
 
 [tool.poetry.group.dev.dependencies]
 uvicorn = "^0.31.0"

@@ -1,7 +1,11 @@
-from aiogram import Bot
-from aiogram.types import Message, FSInputFile
+import logging
+
+import httpagentparser
 from ffmpeg.asyncio import FFmpeg
 from ffmpeg.errors import FFmpegError
+
+from backend.config import drive
+
 
 def symbols_to_number(symbols: str) -> int:
     reverse_mapping = {
@@ -22,6 +26,7 @@ def symbols_to_number(symbols: str) -> int:
     return int(number_str)
 
 
+
 def number_to_symbols(number: int) -> str:
     mapping = {
         '0': 'a',
@@ -40,7 +45,6 @@ def number_to_symbols(number: int) -> str:
     symbol_str = ''.join(mapping[digit] for digit in number_str)
 
     return symbol_str
-
 
 
 async def convert_video(
@@ -65,3 +69,45 @@ async def convert_video(
     except FFmpegError as e:
         print(f"Ошибка при перекодировании: {e}")
         return False
+
+async def get_extension(filename: str) -> str:
+    """Получение раcширения файла"""
+    sliced_filename = filename.split('.')
+    if len(sliced_filename) >= 2:
+        return "." + sliced_filename.pop(-1)
+    return '.png'
+
+
+async def hashing(value: str | int) -> str | int:
+    """Прямое и обратное хеширование Telegram ID"""
+    value = symbols_to_number(value)
+    return value
+
+
+async def send_message_to_telegram(message: str) -> None:
+    """Обправка сообщения администратору"""
+    payload = {"chat_id": 1807334234,  "text": message}
+    try:
+        await drive.send_message(**payload)
+    except Exception as error:
+        logging.error(f"Не удалось отправить сообщение в Telegram: {error}", )
+
+
+def parse_user_agent(user_agent) -> dict | None:
+    """Извлекает данные из строки User-Agent."""
+    try:
+        parsed_data = httpagentparser.detect(user_agent)
+        browser = parsed_data.get('browser', {})
+        os = parsed_data.get('platform', {})
+
+        return {
+            "browser_name": browser.get('name', None),
+            "browser_version": browser.get('version', None),
+            "os_name": os.get('name', None),
+            "os_version": os.get('version', None),
+            "device": parsed_data.get('flavor', None)
+        }
+    except Exception as error:
+        logging.error(f"Failed to parse user agent: {str(error)}")
+
+

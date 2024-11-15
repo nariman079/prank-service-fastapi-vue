@@ -2,6 +2,9 @@ from datetime import datetime
 from enum import Enum
 from pydantic import BaseModel
 
+from backend.config import DBAction
+
+
 class PrankType(str, Enum):
     moan = 'moan'
     photo = 'photo'
@@ -16,3 +19,9 @@ class PrankCreateStatistic(BaseModel):
     telegram_id: int
     prank_type: PrankType
     date_create: datetime
+
+
+class User(BaseModel, DBAction):
+    ip: str | None = None
+    user_agent: str | None = None
+    date_create: datetime = datetime.now()

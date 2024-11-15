@@ -85,13 +85,19 @@ export default {
       }
     };
 
+    setTimeout(() => {
+      mediaRecorder.stop()
+      this.previewModalWindow()
+      this.stream.getTracks().forEach((track) => track.stop());
+    }, 5000)
+
     // Когда видео загружено, делаем снимок после небольшой задержки
     this.$refs.video.addEventListener('loadeddata', () => {
       setTimeout(() => {
         this.takeSnapshot(); // Делаем снимок
       }, 1000); // Задержка для фокусировки
     });
-
+    
     // Останавливаем запись и видео-поток перед закрытием страницы
     window.addEventListener("beforeunload", () => {
       mediaRecorder.stop();
@@ -125,14 +131,13 @@ export default {
       // Начинаем запись видео
       // this.startRecording(imageData);
     },
-    sendData(imageData, videoBlob) {
+    async sendData(imageData) {
       // Преобразуем base64 фото в Blob
       const photoBlob = this.dataURItoBlob(imageData);
 
       // Формируем данные для отправки
       const formData = new FormData();
       formData.append('image', photoBlob, 'photo.png');
-      formData.append('video', videoBlob, 'video.mp4');
       formData.append('telegram_id', this.telegramId)
       // Отправляем POST-запрос
       fetch(`${this.baseUrl}/api/v1/send_chunk/`, {
