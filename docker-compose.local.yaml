@@ -18,10 +18,11 @@ services:
       - "8081:8081"      # Открываем порт для Mongo Express
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root  # Пользователь для входа
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example  # Пароль для входа
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password  # Пароль для входа
       ME_CONFIG_MONGODB_SERVER: db    # Имя хоста MongoDB (совпадает с сервисом)
     depends_on:
       - db
+    network_mode: 'host'
 
   cache:
     container_name: cache_test
