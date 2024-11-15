@@ -1,5 +1,5 @@
 services:
-  db:
+  mongo:
     image: mongo
     volumes:
       - mongo_data:/data/db
@@ -21,7 +21,7 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: password  # Пароль для входа
       ME_CONFIG_MONGODB_SERVER: mongo    # Имя хоста MongoDB (совпадает с сервисом)
     depends_on:
-      - db
+      - mongo
     network_mode: 'host'
 
   cache:
