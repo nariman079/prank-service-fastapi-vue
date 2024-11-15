@@ -29,26 +29,22 @@ class DBController:
         self.db = client['Statistic']
         self.table: Collection = self.db[table_name]
 
+db_conn = DBController
 
 class DBAction:
-
-    @property
-    def conn(self):
-        self.conn = DBController(self.__name__)
-        return self._conn
 
     @classmethod
     async def create(cls: BaseModel | Self, **kwargs) -> Self:
         """
         Создание документа
         """
-        return cls._conn.table.insert_one(cls(**kwargs).dict())
+        return db_conn(
+            cls.__name__
+        ).table.insert_one(
+            cls(**kwargs).dict()
+        )
 
     @classmethod
     def aggregate(cls: Self | BaseModel, param: Any):
         """Агрегирование данных"""
-        return cls._conn.table.aggregate(param)
-
-    @conn.setter
-    def conn(self, value):
-        self._conn = value
+        return cls.connection.table.aggregate(param)
