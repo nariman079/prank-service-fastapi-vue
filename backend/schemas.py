@@ -10,16 +10,10 @@ class PrankType(str, Enum):
     photo = 'photo'
     video = 'video'
 
-class PrankStatistic(BaseModel):
+class Prank(BaseModel, DBAction):
     telegram_id: str
-    prank_type: PrankType
-    date_create: datetime
-
-class PrankCreateStatistic(BaseModel):
-    telegram_id: int
-    prank_type: PrankType
-    date_create: datetime
-
+    prank_type: PrankType | None = None
+    date_create: datetime = datetime.now()
 
 class User(BaseModel, DBAction):
     ip: str | None = None

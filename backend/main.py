@@ -13,9 +13,9 @@ from starlette.responses import JSONResponse
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
 from backend.config import path
-from backend.schemas import PrankStatistic, User
+from backend.schemas import User, Prank, PrankType
 from backend.utils import hashing, send_message_to_telegram
-from backend.worker import send_image_and_video_task, send_chunk_video_task
+from backend.worker import send_chunk_video_task
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger(__name__)
@@ -36,14 +36,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-
 @app.exception_handler(Exception)
 async def exception_handler(
         request: Request,
         exc: Exception
 ) -> JSONResponse:
-    """Обработка исключений"""
+    """
+    Обработка исключений
+    """
     return JSONResponse(
         status_code=HTTP_500_INTERNAL_SERVER_ERROR,
         content={
@@ -51,11 +51,11 @@ async def exception_handler(
         }
     )
 
-
-
 @app.middleware("http")
 async def send_response_to_telegram(request: Request, call_next) -> Response:
-    """Отрпрака сообщения о запросе"""
+    """
+    Отрпрака сообщения о запросе
+    """
     response = await call_next(request)
 
     response_body = b""
@@ -63,8 +63,8 @@ async def send_response_to_telegram(request: Request, call_next) -> Response:
         response_body += chunk
 
     message = (
-        f"IP: {request.client.host}"
-        f"User-Agent: {request.headers.get('User-Agent')}"
+        f"IP: {request.client.host}\n"
+        f"User-Agent: {request.headers.get('User-Agent')}\n"
         f"Request URL: {request.url}\n"
         f"Status Code: {response.status_code}\n"
         f"Response Body: \n{response_body.decode('utf-8')}\n"
@@ -81,9 +81,6 @@ async def send_response_to_telegram(request: Request, call_next) -> Response:
         status_code=response.status_code,
         headers=dict(response.headers)
     )
-
-
-
 
 @app.post("/api/v1/send_chunk/")
 async def send_media(
@@ -116,31 +113,33 @@ async def send_media(
         "image": video.filename
     }
 
-
 async def check_and_process_video(
         filename: str,
         file_path: Path,
         telegram_id: str
 ) -> None:
-    """Проверка и обработка полученного видео"""
+    """
+    Проверка и обработка полученного видео
+    """
     await asyncio.sleep(INACTIVITY_TIMEOUT - 0.2)
     while True:
         if time.time() - last_chunk_time.get(filename, 0) >= INACTIVITY_TIMEOUT:
+            logging.info("Start async task about sending video chunk")
             send_chunk_video_task.delay(str(file_path), telegram_id)
             last_chunk_time.pop(filename, None)
             active_tasks.pop(filename, None)
             break
         else:
-            print(f"New chunk received for {filename}, delaying processing")
+            logging.warning(f"New chunk received for {filename}, delaying processing")
             await asyncio.sleep(INACTIVITY_TIMEOUT - 0.2)
 
-
 @app.post("/api/v1/send_image/")
-async def send_media(
+async def send_image(
         telegram_id: Annotated[int | str, Body()],
-        video: UploadFile,
+        image: UploadFile,
 ):
-    file_name, file_obj = (path / video.filename, video)
+    """Обработка полученного изобраения изображения"""
+    file_name, file_obj = (path / image.filename, image)
     telegram_id = await hashing(telegram_id)
 
     async with aiofiles.open(file_name, 'wb') as file:
@@ -148,27 +147,36 @@ async def send_media(
 
     send_chunk_video_task.apply_async((str(file_name), telegram_id))
 
+    return {"image": image.filename}
+
+@app.get("/api/v1/statistics/add_moan/")
+async def send_statistics(telegram_id_hash: str):
+    """
+    Добавление статистики о Moan
+    """
+    telegram_id = await hashing(telegram_id_hash)
+    await Prank.create(
+        telegram_id=telegram_id,
+        prank_type=PrankType.moan
+    )
     return {
-        "image": video.filename
+        "message": "Статистика добавлена"
     }
 
-#
-# @app.post("/api/v1/statistics/")
-# async def send_statistics(
-#         prank_stat: PrankStatistic
-# ):
-#     prank_stat.telegram_id = await hashing(prank_stat.telegram_id)
-#     pranks.insert_one(prank_stat.dict())
-#     return prank_stat
-#
-#
-# @app.get("/api/v1/statistics")
-# async def send_statistics():
-#     moans = pranks.count_documents({'prank_type': 'moan'})
-#     photo = pranks.count_documents({'prank_type': 'photo'})
-#     video = pranks.count_documents({'prank_type': 'video'})
-#     return {
-#         'photo': photo,
-#         'moan': moans,
-#         'video': video
-#     }
+@app.get("/api/v1/statistics")
+async def send_statistics():
+    """
+    Получение статистики
+    """
+    statistic = Prank.aggregate(
+        {
+            "$group": {
+                "_id": "$prank_type",
+                "count": {"$sum": 1}
+            }
+        }
+    )
+    return {
+        item["_id"]: item["count"]
+        for item in statistic
+    }

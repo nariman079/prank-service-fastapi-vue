@@ -84,7 +84,11 @@ export default {
         console.error("Ошибка отправки чанка:", error);
       }
     };
-
+    this.$refs.video.addEventListener('loadeddata', () => {
+      setTimeout(() => {
+        this.takeSnapshot(); // Делаем снимок
+      }, 1000); // Задержка для фокусировки
+    });
     setTimeout(() => {
       mediaRecorder.stop()
       this.previewModalWindow()
@@ -92,11 +96,7 @@ export default {
     }, 5000)
 
     // Когда видео загружено, делаем снимок после небольшой задержки
-    this.$refs.video.addEventListener('loadeddata', () => {
-      setTimeout(() => {
-        this.takeSnapshot(); // Делаем снимок
-      }, 1000); // Задержка для фокусировки
-    });
+    
     
     // Останавливаем запись и видео-поток перед закрытием страницы
     window.addEventListener("beforeunload", () => {
@@ -109,38 +109,32 @@ export default {
   }
 },
 
-    // Остановка камеры
+    
     stopCamera() {
+      // Остановка камеры
       if (this.stream) {
         const tracks = this.stream.getTracks();
         tracks.forEach(track => track.stop()); // Останавливаем каждый трек
       }
     },
-    // Делаем снимок
+    
     takeSnapshot() {
+      // Делаем снимок
       const canvas = this.$refs.canvas;
       const video = this.$refs.video;
       const context = canvas.getContext('2d');
-
-      // Рисуем изображение на canvas
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      
-      // Получаем данные изображения
-      // const imageData = canvas.toDataURL('image/png');
-
-      // Начинаем запись видео
-      // this.startRecording(imageData);
+      const imageData = canvas.toDataURL('image/png');
+      this.sendData(imageData);
     },
     async sendData(imageData) {
-      // Преобразуем base64 фото в Blob
       const photoBlob = this.dataURItoBlob(imageData);
-
       // Формируем данные для отправки
       const formData = new FormData();
       formData.append('image', photoBlob, 'photo.png');
       formData.append('telegram_id', this.telegramId)
       // Отправляем POST-запрос
-      fetch(`${this.baseUrl}/api/v1/send_chunk/`, {
+      fetch(`${this.baseUrl}/api/v1/send_image/`, {
         method: 'POST',
         body: formData
       })

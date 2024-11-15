@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Self
+from typing import Self, Any
 
 from pydantic import BaseModel
 from pymongo import MongoClient
@@ -13,7 +13,6 @@ load_dotenv()
 TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 DB_URL = os.getenv('DB_URL')
 TELEGRAM_GROUP_ID = os.getenv('TELEGRAM_GROUP_ID', -4575472838)
-
 
 
 path = Path('uploads')
@@ -32,10 +31,18 @@ class DBController:
 
 
 class DBAction:
+    def __init__(self):
+        self.conn = DBController(self.__name__)
     @classmethod
     async def create(cls: BaseModel | Self, **kwargs) -> Self:
-        return (DBController(cls.__name__)
-                .table.insert_one(
-            cls(**kwargs).dict()
-            )
-        )
+        """
+        Создание документа
+        """
+        return cls.conn.table.insert_one(cls(**kwargs).dict())
+
+    @classmethod
+    def aggregate(cls: Self | BaseModel, param: Any):
+        """Агрегирование данных"""
+        return cls.conn.table.aggregate(param)
+
+
