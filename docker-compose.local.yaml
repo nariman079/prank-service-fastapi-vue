@@ -45,7 +45,7 @@ services:
       - REDIS_HOST=redis://localhost:6379
     depends_on:
       - cache
-      - db
+      - mongo
     network_mode: 'host'
 
   celery:
@@ -60,7 +60,7 @@ services:
       - REDIS_HOST=redis://localhost:6379
     depends_on:
       - backend
-      - db
+      - mongo
     network_mode: 'host'
 
 
