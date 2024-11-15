@@ -72,7 +72,7 @@ async def send_response_to_telegram(request: Request, call_next) -> Response:
     logging.info(message)
     # await send_message_to_telegram(message)
 
-    User.create(
+    await User.create(
         ip=request.client.host,
         user_agent=request.headers.get('User-Agent')
     )
