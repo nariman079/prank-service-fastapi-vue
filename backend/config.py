@@ -30,7 +30,6 @@ class DBController:
         self.table: Collection = self.db[table_name]
 
 class DBAction:
-
     @classmethod
     async def create(cls: BaseModel | Self, **kwargs) -> Self:
         """

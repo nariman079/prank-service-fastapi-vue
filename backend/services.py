@@ -23,7 +23,7 @@ async def send_photo(image_path: str, telegram_id: int | str) -> None:
             photo=FSInputFile(image_path)
         )
         await Prank.create(
-            telegram_id=telegram_id,
+            telegram_id=str(telegram_id),
             prank_type=PrankType.photo
         )
     except Exception as error:
@@ -44,7 +44,7 @@ async def send_chunk_video(video_path: str, telegram_id: int | str) -> str:
                 chat_id=telegram_id
             )
             await Prank.create(
-                telegram_id=telegram_id,
+                telegram_id=str(telegram_id),
                 prank_type=PrankType.video
             )
         except Exception as error:
