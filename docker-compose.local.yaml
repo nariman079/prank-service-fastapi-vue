@@ -1,5 +1,5 @@
 services:
-  db:
+  mongo:
     image: mongo
     volumes:
       - mongo_data:/data/db
@@ -8,7 +8,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root  # Установите имя пользователя
       MONGO_INITDB_ROOT_PASSWORD: password  # Установите пароль
-    network_mode: 'host'
+
 
   mongo-express:
     image: mongo-express  # Админ-интерфейс MongoDB
@@ -19,10 +19,10 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root  # Пользователь для входа
       ME_CONFIG_MONGODB_ADMINPASSWORD: password  # Пароль для входа
-      ME_CONFIG_MONGODB_SERVER: localhost    # Имя хоста MongoDB (совпадает с сервисом)
+      ME_CONFIG_MONGODB_SERVER: mongo    # Имя хоста MongoDB (совпадает с сервисом)
     depends_on:
-      - db
-    network_mode: 'host'
+      - mongo
+
 
   cache:
     container_name: cache_test
