@@ -10,6 +10,19 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password  # Установите пароль
     network_mode: 'host'
 
+  mongo-express:
+    image: mongo-express:latest  # Админ-интерфейс MongoDB
+    container_name: mongo-express
+    restart: always
+    ports:
+      - "8081:8081"      # Открываем порт для Mongo Express
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root  # Пользователь для входа
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example  # Пароль для входа
+      ME_CONFIG_MONGODB_SERVER: db    # Имя хоста MongoDB (совпадает с сервисом)
+    depends_on:
+      - db
+
   cache:
     container_name: cache_test
     image: 'redis:alpine'
