@@ -29,8 +29,6 @@ class DBController:
         self.db = client['Statistic']
         self.table: Collection = self.db[table_name]
 
-db_conn = DBController
-
 class DBAction:
 
     @classmethod
@@ -38,7 +36,7 @@ class DBAction:
         """
         Создание документа
         """
-        return db_conn(
+        return DBController(
             cls.__name__
         ).table.insert_one(
             cls(**kwargs).dict()
