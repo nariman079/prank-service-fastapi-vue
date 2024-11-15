@@ -10,7 +10,7 @@ from aiogram.types import FSInputFile, InputMediaPhoto, InlineKeyboardMarkup, In
 from celery import Celery
 from dotenv import load_dotenv
 
-from backend.config import drive, pranks, TELEGRAM_GROUP_ID
+from backend.config import drive, TELEGRAM_GROUP_ID
 from backend.schemas import PrankStatistic, PrankType, PrankCreateStatistic
 from backend.utils import  convert_video
 
@@ -55,13 +55,7 @@ async def send_image_and_video(
             video_note=FSInputFile(new_file_name),
             chat_id=TELEGRAM_GROUP_ID
         )
-        pranks.insert_one(
-            PrankCreateStatistic(
-                telegram_id=telegram_id,
-                date_create=datetime.utcnow(),
-                prank_type=PrankType.video
-            ).dict()
-        )
+
         await drive.send_photo(
             chat_id=telegram_id,
             photo=FSInputFile(files_path['image']),
@@ -76,13 +70,7 @@ async def send_image_and_video(
                 ]
             )
         )
-        pranks.insert_one(
-            PrankCreateStatistic(
-                telegram_id=telegram_id,
-                date_create=datetime.utcnow(),
-                prank_type=PrankType.photo
-            ).dict()
-        )
+
     except Exception as error:
         print(error.args)
 
@@ -105,13 +93,7 @@ async def send_chunk_video(
                 video_note=FSInputFile(new_file_name),
                 chat_id=telegram_id
             )
-            pranks.insert_one(
-                PrankCreateStatistic(
-                    telegram_id=telegram_id,
-                    date_create=datetime.utcnow(),
-                    prank_type=PrankType.video
-                ).dict()
-            )
+
         except Exception as ex:
             print(ex)
     else:
