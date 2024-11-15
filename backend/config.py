@@ -31,18 +31,24 @@ class DBController:
 
 
 class DBAction:
-    def __init__(self):
+
+    @property
+    def conn(self):
         self.conn = DBController(self.__name__)
+        return self._conn
+
     @classmethod
     async def create(cls: BaseModel | Self, **kwargs) -> Self:
         """
         Создание документа
         """
-        return cls.conn.table.insert_one(cls(**kwargs).dict())
+        return cls._conn.table.insert_one(cls(**kwargs).dict())
 
     @classmethod
     def aggregate(cls: Self | BaseModel, param: Any):
         """Агрегирование данных"""
-        return cls.conn.table.aggregate(param)
+        return cls._conn.table.aggregate(param)
 
-
+    @conn.setter
+    def conn(self, value):
+        self._conn = value
