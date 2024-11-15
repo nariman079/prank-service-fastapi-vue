@@ -34,7 +34,7 @@ class DBController:
 class DBAction:
     @classmethod
     async def create(cls: BaseModel | Self, **kwargs) -> Self:
-        return (DBController(cls.__repr_name__)
+        return (DBController(cls.__name__)
                 .table.insert_one(
             cls(**kwargs).dict()
             )
