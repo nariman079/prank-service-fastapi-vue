@@ -19,27 +19,28 @@ async def send_photo(image_path: str, telegram_id: int | str) -> None:
     message_uuid = Path(image_path).stem
     telegram_message = await TelegramMessage.get(message_uuid=message_uuid)
     logging.info(message_uuid)
-    try:
-        await drive.send_photo(
-            chat_id=telegram_id,
-            photo=FSInputFile(image_path),
-            reply_markup=InlineKeyboardMarkup(
-                inline_keyboard=[
-                    [InlineKeyboardButton(
-                        callback_data=f"video_message_id:{telegram_message.message_id}",
-                        text="Посмотреть видео"
-                    )]
-                ]
+    if telegram_message:
+        try:
+            await drive.send_photo(
+                chat_id=telegram_id,
+                photo=FSInputFile(image_path),
+                reply_markup=InlineKeyboardMarkup(
+                    inline_keyboard=[
+                        [InlineKeyboardButton(
+                            callback_data=f"video_message_id:{telegram_message.message_id}",
+                            text="Посмотреть видео"
+                        )]
+                    ]
+                )
             )
-        )
-        logging.info("Завершение обработки изображения и отправки в телеграм бота")
-        await Prank.create(
-            telegram_id=str(telegram_id),
-            prank_type=PrankType.photo
-        )
-        logging.info(f"Запись статистики: {PrankType.photo}")
-    except Exception as error:
-        logging.error(f"Ошибка отправки изображения: {error}")
+            logging.info("Завершение обработки изображения и отправки в телеграм бота")
+            await Prank.create(
+                telegram_id=str(telegram_id),
+                prank_type=PrankType.photo
+            )
+            logging.info(f"Запись статистики: {PrankType.photo}")
+        except Exception as error:
+            logging.error(f"Ошибка отправки изображения: {error}")
 
 async def send_chunk_video(video_path: str, telegram_id: int | str) -> str | None:
     """
