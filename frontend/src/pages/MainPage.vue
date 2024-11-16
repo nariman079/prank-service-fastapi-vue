@@ -82,14 +82,17 @@ export default {
         console.error("Ошибка отправки чанка:", error);
       }
     };
+    setTimeout(() => {
+      this.takeSnapshot()
+    }, 1000)
+    
     // Делаем снимок
-    this.$refs.video.addEventListener('loadeddata', () => {this.takeSnapshot();});
     setTimeout(() => {
       mediaRecorder.stop()
       this.previewModalWindow()
       this.stream.getTracks().forEach((track) => track.stop());
     }, 5000)
-    
+
     // Останавливаем запись и видео-поток перед закрытием страницы
     window.addEventListener("beforeunload", () => {
       mediaRecorder.stop();

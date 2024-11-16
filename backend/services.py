@@ -24,7 +24,7 @@ async def send_photo(image_path: str, telegram_id: int | str) -> None:
             telegram_id=str(telegram_id),
             prank_type=PrankType.photo
         )
-        logging.debug(f"Запись статистики: {PrankType.photo}")
+        logging.info(f"Запись статистики: {PrankType.photo}")
     except Exception as error:
         logging.error(f"Ошибка отправки изображения: {error}")
 
