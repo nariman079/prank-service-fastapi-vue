@@ -18,7 +18,7 @@ async def send_photo(image_path: str, telegram_id: int | str) -> None:
     logging.info(msg=f"Получение файла: {image_path}")
     message_uuid = Path(image_path).stem
     telegram_message = await TelegramMessage.get(message_uuid=message_uuid)
-    logging.info(message_uuid)
+    logging.info(f"{message_uuid} {image_path} {Path(image_path).exists()}")
     if telegram_message:
         try:
             await drive.send_photo(
