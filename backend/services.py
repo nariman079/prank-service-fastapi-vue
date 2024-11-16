@@ -17,36 +17,31 @@ async def send_photo(image_path: str, telegram_id: int | str) -> None:
     """
     logging.info(msg=f"Получение файла: {image_path}")
     message_uuid = Path(image_path).stem
-    while True:
-        await asyncio.sleep(3)
+    telegram_message = await TelegramMessage.get(message_uuid=message_uuid)
 
-        telegram_message = await TelegramMessage.get(message_uuid=message_uuid)
-
-        if telegram_message:
-            try:
-                await drive.send_photo(
-                    chat_id=telegram_id,
-                    photo=FSInputFile(image_path),
-                    reply_markup=InlineKeyboardMarkup(
-                        keyboard=[
-                            InlineKeyboardButton(
-                                url=f"https://{telegram_message.message_id}",
-                                text="Посмотреть видео"
-                            )
-                        ]
+    try:
+        await drive.send_photo(
+            chat_id=telegram_id,
+            photo=FSInputFile(image_path),
+            reply_markup=InlineKeyboardMarkup(
+                keyboard=[
+                    InlineKeyboardButton(
+                        url=f"https://{telegram_message.message_id}",
+                        text="Посмотреть видео"
                     )
-                )
-                logging.info("Завершение обработки изображения и отправки в телеграм бота")
-                await Prank.create(
-                    telegram_id=str(telegram_id),
-                    prank_type=PrankType.photo
-                )
-                logging.info(f"Запись статистики: {PrankType.photo}")
-            except Exception as error:
-                logging.error(f"Ошибка отправки изображения: {error}")
-        else:
-            logging.warning(f"Не найден ID сообщения: {message_uuid}")
-            pass
+                ]
+            )
+        )
+        logging.info("Завершение обработки изображения и отправки в телеграм бота")
+        await Prank.create(
+            telegram_id=str(telegram_id),
+            prank_type=PrankType.photo
+        )
+        logging.info(f"Запись статистики: {PrankType.photo}")
+    except Exception as error:
+        logging.error(f"Ошибка отправки изображения: {error}")
+
+
 
 async def send_chunk_video(video_path: str, telegram_id: int | str) -> str | None:
     """

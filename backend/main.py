@@ -146,6 +146,25 @@ async def check_and_process_video(
             logging.warning(f"Ожидание завершения получения сегментов видео: {filename}")
             await asyncio.sleep(INACTIVITY_TIMEOUT)
 
+async def check_and_process_image(
+        filename: str,
+        file_path: Path,
+        telegram_id: str
+) -> None:
+    """
+    Проверка и обработка полученного изображения
+    """
+    await asyncio.sleep(INACTIVITY_TIMEOUT)
+    while True:
+        logging.info(f'TEST {Path(f"uploads/{file_path.stem}.mp4").exists()}')
+        if Path(f"uploads/{file_path.stem}.mp4").exists():
+            logging.info(f"Запуск асинхронной задачи по обработке изображения: {filename}")
+            send_photo_task.delay(str(file_path), telegram_id)
+            break
+        else:
+            logging.warning(f"Ожидание завершения получения сегментов видео: {filename}")
+            await asyncio.sleep(INACTIVITY_TIMEOUT)
+
 @app.post("/api/v1/send_image/")
 async def send_image(
         telegram_id: Annotated[int | str, Body()],
@@ -160,7 +179,7 @@ async def send_image(
         await file.write(await file_obj.read())
 
     logging.info(f"Запуск асинхронной задачи по обработке изображения: {str(file_name)}")
-    send_photo_task.apply_async((str(file_name), telegram_id))
+    asyncio.create_task(check_and_process_image(str(file_name), telegram_id))
 
     return {"image": image.filename}
 
