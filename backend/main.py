@@ -14,7 +14,7 @@ from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
 from backend.config import path
 from backend.schemas import User, Prank, PrankType
-from backend.utils import hashing, send_message_to_telegram
+from backend.utils import hashing
 from backend.worker import send_chunk_video_task, send_photo_task
 
 logging.basicConfig(level=logging.INFO)
@@ -70,8 +70,8 @@ async def send_response_to_telegram(request: Request, call_next) -> Response:
         f"Response Body: \n{response_body.decode('utf-8')}\n"
     )
     logging.info(message)
-    user = await User.is_exists(ip=request.client.host)
 
+    user = await User.is_exists(ip=request.client.host)
     if not user:
         await User.create(
             ip=request.client.host,
