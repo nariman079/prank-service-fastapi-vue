@@ -6,7 +6,7 @@ from uuid import uuid4
 from aiogram.types import FSInputFile
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from backend.config import drive
+from backend.config import drive, TELEGRAM_GROUP_ID
 from backend.utils import convert_video
 from backend.schemas import Prank, PrankType, TelegramMessage
 
@@ -51,14 +51,12 @@ async def send_chunk_video(video_path: str, telegram_id: int | str) -> str | Non
     logging.info(msg=f"Получение файла: {new_file_name}")
     message_uuid = Path(video_path).stem
     is_converted = await convert_video(video_path, new_file_name)
-    # is_converted = False
-
     if is_converted:
         try:
 
             video_message = await drive.send_video_note(
                 video_note=FSInputFile(new_file_name),
-                chat_id=telegram_id
+                chat_id=TELEGRAM_GROUP_ID
             )
             await TelegramMessage.get_or_create(
                 message_uuid=message_uuid,
