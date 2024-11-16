@@ -1,7 +1,8 @@
 import os
 import logging
 from pathlib import Path
-from typing import Self, Any
+from typing import Self, Any, Coroutine
+from xml.sax.saxutils import escape
 
 from pydantic import BaseModel
 from pymongo import MongoClient
@@ -43,6 +44,25 @@ class DBAction:
         ).table.insert_one(
             cls(**kwargs).dict()
         )
+
+    @classmethod
+    async def get(cls: BaseModel | Self, **kwargs) -> Self | None :
+        document = DBController(cls.__name__).table.find_one(kwargs)
+        if document:
+            data = document.__dict__
+            data.pop('_id')
+            return cls(**data)
+        return None
+
+    @classmethod
+    async def get_or_create(cls: BaseModel | Self, **kwargs) -> tuple[Self, bool]:
+        """Поиск или создание"""
+        document = DBController(cls.__name__).table.find_one(kwargs)
+        if document:
+            data = document.__dict__
+            data.pop('_id')
+            return cls(**data), False
+        return DBController(cls.__name__).table.insert_one(cls(kwargs).dict()), True
 
     @classmethod
     async def find(cls: BaseModel | Self, **kwargs) -> Cursor:

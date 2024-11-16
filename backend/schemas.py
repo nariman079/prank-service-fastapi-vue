@@ -26,3 +26,7 @@ class Error(BaseModel, DBAction):
     exception_data: str | None = None
     exception_args: list | None = None
     date_create: datetime = datetime.now()
+
+class TelegramMessage(BaseModel, DBAction):
+    message_uuid: str | None = None
+    message_id: str | None = None

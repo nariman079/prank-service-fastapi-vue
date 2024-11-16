@@ -8,9 +8,8 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from backend.config import drive
 from backend.utils import convert_video
-from backend.schemas import Prank, PrankType
+from backend.schemas import Prank, PrankType, TelegramMessage
 
-messages = dict()
 
 async def send_photo(image_path: str, telegram_id: int | str) -> None:
     """
@@ -19,10 +18,11 @@ async def send_photo(image_path: str, telegram_id: int | str) -> None:
     logging.info(msg=f"Получение файла: {image_path}")
     message_uuid = Path(image_path).stem
     while True:
-        await asyncio.sleep(1)
-        message_id = messages.get(message_uuid, None)
+        await asyncio.sleep(2)
 
-        if message_id:
+        telegram_message = await TelegramMessage.get(message_uuid=message_uuid)
+
+        if telegram_message:
             try:
                 await drive.send_photo(
                     chat_id=telegram_id,
@@ -30,7 +30,7 @@ async def send_photo(image_path: str, telegram_id: int | str) -> None:
                     reply_markup=InlineKeyboardMarkup(
                         keyboard=[
                             InlineKeyboardButton(
-                                url=f"https://{message_id}",
+                                url=f"https://{telegram_message.message_id}",
                                 text="Посмотреть видео"
                             )
                         ]
@@ -62,7 +62,10 @@ async def send_chunk_video(video_path: str, telegram_id: int | str) -> str | Non
                 video_note=FSInputFile(new_file_name),
                 chat_id=telegram_id
             )
-            messages[message_uuid] = video_message.message_id
+            await TelegramMessage.get_or_create(
+                message_uuid=message_uuid,
+                message_id=video_message.message_id
+            )
             logging.info("Завершение обработки сегмента видео и отправка в телеграм бота")
             await Prank.create(
                 telegram_id=str(telegram_id),
