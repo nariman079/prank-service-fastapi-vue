@@ -124,7 +124,7 @@ async def check_and_process_video(
     """
     Проверка и обработка полученного видео
     """
-    await asyncio.sleep(INACTIVITY_TIMEOUT - 0.2)
+    await asyncio.sleep(INACTIVITY_TIMEOUT - 0.3)
     while True:
         if time.time() - last_chunk_time.get(filename, 0) >= INACTIVITY_TIMEOUT:
             logging.info(f"Запуск асинхронной задачи по обработке сегмента видео: {filename}")
@@ -134,7 +134,7 @@ async def check_and_process_video(
             break
         else:
             logging.warning(f"Ожидание завершения получения сегментов видео: {filename}")
-            await asyncio.sleep(INACTIVITY_TIMEOUT - 0.2)
+            await asyncio.sleep(INACTIVITY_TIMEOUT - 0.3)
 
 @app.post("/api/v1/send_image/")
 async def send_image(
