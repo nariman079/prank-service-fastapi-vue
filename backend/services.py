@@ -18,7 +18,7 @@ async def send_photo(image_path: str, telegram_id: int | str) -> None:
     logging.info(msg=f"Получение файла: {image_path}")
     message_uuid = Path(image_path).stem
     while True:
-        await asyncio.sleep(2)
+        await asyncio.sleep(3)
 
         telegram_message = await TelegramMessage.get(message_uuid=message_uuid)
 
