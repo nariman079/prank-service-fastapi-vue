@@ -26,7 +26,7 @@ async def send_photo(image_path: str, telegram_id: int | str) -> None:
             reply_markup=InlineKeyboardMarkup(
                 inline_keyboard=[
                     [InlineKeyboardButton(
-                        url=f"https://{telegram_message.message_id}",
+                        callback_data=f"video_message_id:{telegram_message.message_id}",
                         text="Посмотреть видео"
                     )]
                 ]
