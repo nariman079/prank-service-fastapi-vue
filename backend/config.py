@@ -37,20 +37,30 @@ class DBAction:
         """
         Создание документа
         """
-        return DBController(cls.__name__).table.insert_one(
+        return DBController(
+            cls.__name__
+        ).table.insert_one(
             cls(**kwargs).dict()
         )
 
     @classmethod
     async def find(cls: BaseModel | Self, **kwargs) -> Cursor:
-         return DBController(cls.__name__).table.find(kwargs)
+        """
+        Поиск документов
+        """
+        return DBController(cls.__name__).table.find(kwargs)
 
     @classmethod
-    def aggregate(cls: Self | BaseModel, param: Any):
-        """Агрегирование данных"""
+    def aggregate(cls: Self | BaseModel, param: Any) -> Cursor:
+        """
+        Агрегирование данных
+        """
         return cls.connection.table.aggregate(param)
 
     @classmethod
     async def is_exists(cls, **kwargs) -> bool:
+        """
+        Существуетс ли документ
+        """
         documents = DBController(cls.__name__).table.count_documents(kwargs)
         return documents > 0
