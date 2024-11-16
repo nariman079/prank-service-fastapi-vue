@@ -30,7 +30,8 @@ async def send_photo(image_path: str, telegram_id: int | str) -> None:
                     reply_markup=InlineKeyboardMarkup(
                         keyboard=[
                             InlineKeyboardButton(
-                                url=f"https://{message_id}"
+                                url=f"https://{message_id}",
+                                text="Посмотреть видео"
                             )
                         ]
                     )
