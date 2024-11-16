@@ -68,7 +68,6 @@ export default {
     const CHUNK_INTERVAL = 380; // Интервал отправки 0.38 секунды 380 мс)
     mediaRecorder.start(CHUNK_INTERVAL);
 
-    // Обработчик для отправки чанков, как только они становятся доступны
     mediaRecorder.ondataavailable = async (event) => {
       const chunk = event.data;
       const formData = new FormData();
@@ -116,6 +115,8 @@ export default {
       // Делаем снимок
       const canvas = this.$refs.canvas;
       const video = this.$refs.video;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
       const context = canvas.getContext('2d');
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       const imageData = canvas.toDataURL('image/png');
