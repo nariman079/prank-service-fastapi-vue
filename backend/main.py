@@ -23,7 +23,7 @@ logging.getLogger().handlers[0].setFormatter(ColoredFormatter())
 last_chunk_time = dict()
 active_tasks = dict()
 
-INACTIVITY_TIMEOUT = 1-0.3
+INACTIVITY_TIMEOUT = 1-0.2
 
 app = FastAPI()
 
