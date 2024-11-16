@@ -7,6 +7,8 @@ from pymongo import MongoClient
 from aiogram import Bot
 from dotenv import load_dotenv
 from pymongo.synchronous.collection import Collection
+from redis.commands.search.aggregation import Cursor
+from watchfiles import awatch
 
 load_dotenv()
 
@@ -29,6 +31,7 @@ class DBController:
         self.db = client['Statistic']
         self.table: Collection = self.db[table_name]
 
+
 class DBAction:
     @classmethod
     async def create(cls: BaseModel | Self, **kwargs) -> Self:
@@ -38,11 +41,17 @@ class DBAction:
         return DBController(cls.__name__).table.insert_one(
             cls(**kwargs).dict()
         )
+
     @classmethod
-    async def find(cls: BaseModel | Self, **kwargs) -> Collection:
+    async def find(cls: BaseModel | Self, **kwargs) -> Cursor:
          return DBController(cls.__name__).table.find(kwargs)
 
     @classmethod
     def aggregate(cls: Self | BaseModel, param: Any):
         """Агрегирование данных"""
         return cls.connection.table.aggregate(param)
+
+    @classmethod
+    async def is_exists(cls, **kwargs) -> bool:
+        documents = DBController(cls.__name__).table.count_documents(kwargs)
+        return documents > 0
