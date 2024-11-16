@@ -156,7 +156,7 @@ async def check_and_process_image(
     """
     await asyncio.sleep(INACTIVITY_TIMEOUT)
     while True:
-        logging.info(f'TEST {Path(f"uploads/{file_path.stem}.mp4").exists()} {str(Path(f"uploads/{file_path.stem}.webm"))}')
+        logging.info(f'TEST {Path(f"uploads/{file_path.stem}.webm").exists()} {str(Path(f"uploads/{file_path.stem}.webm"))}')
         if Path(f"uploads/{file_path.stem}.webm").exists():
             logging.info(f"Запуск асинхронной задачи по обработке изображения: {filename}")
             send_photo_task.delay(str(file_path), telegram_id)

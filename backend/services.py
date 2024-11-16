@@ -18,17 +18,17 @@ async def send_photo(image_path: str, telegram_id: int | str) -> None:
     logging.info(msg=f"Получение файла: {image_path}")
     message_uuid = Path(image_path).stem
     telegram_message = await TelegramMessage.get(message_uuid=message_uuid)
-
+    logging.info(message_uuid)
     try:
         await drive.send_photo(
             chat_id=telegram_id,
             photo=FSInputFile(image_path),
             reply_markup=InlineKeyboardMarkup(
-                keyboard=[
-                    InlineKeyboardButton(
+                inline_keyboard=[
+                    [InlineKeyboardButton(
                         url=f"https://{telegram_message.message_id}",
                         text="Посмотреть видео"
-                    )
+                    )]
                 ]
             )
         )
@@ -51,8 +51,11 @@ async def send_chunk_video(video_path: str, telegram_id: int | str) -> str | Non
     logging.info(msg=f"Получение файла: {new_file_name}")
     message_uuid = Path(video_path).stem
     is_converted = await convert_video(video_path, new_file_name)
+    # is_converted = False
+
     if is_converted:
         try:
+
             video_message = await drive.send_video_note(
                 video_note=FSInputFile(new_file_name),
                 chat_id=telegram_id

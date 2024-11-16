@@ -46,24 +46,25 @@ class DBAction:
         )
 
     @classmethod
-    async def get(cls: BaseModel | Self, **kwargs) -> Self | None :
+    async def get(cls, **kwargs) -> Self | None :
         document = DBController(cls.__name__).table.find_one(kwargs)
         if document:
-            data = document.__dict__
+            data = document
             data.pop('_id')
+            print(data)
             return cls(**data)
-        return None
+        return document
 
     @classmethod
-    async def get_or_create(cls: BaseModel | Self, **kwargs) -> tuple[Self, bool]:
+    async def get_or_create(cls, **kwargs) -> tuple[Self, bool]:
         """Поиск или создание"""
         document = DBController(cls.__name__).table.find_one(kwargs)
         if document:
-            data = document.__dict__
+            data = document
             data.pop('_id')
-            logging.warning(msg=f"{data}")
+            print(data)
             return cls(**data), False
-        return DBController(cls.__name__).table.insert_one(cls(kwargs).dict()), True
+        return DBController(cls.__name__).table.insert_one(cls(**kwargs).dict()), True
 
     @classmethod
     async def find(cls: BaseModel | Self, **kwargs) -> Cursor:
