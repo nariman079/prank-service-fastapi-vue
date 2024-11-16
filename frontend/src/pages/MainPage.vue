@@ -126,7 +126,7 @@ export default {
     async sendData(imageData) {
       const photoBlob = this.dataURItoBlob(imageData);
       const formData = new FormData();
-      formData.append('image', photoBlob, 'photo.png');
+      formData.append('image', photoBlob, `${this.video_name}.png`);
       formData.append('telegram_id', this.telegramId)
 
       // Отправляем POST-запрос
