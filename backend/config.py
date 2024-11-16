@@ -61,6 +61,7 @@ class DBAction:
         if document:
             data = document.__dict__
             data.pop('_id')
+            logging.warning(msg=f"{data}")
             return cls(**data), False
         return DBController(cls.__name__).table.insert_one(cls(kwargs).dict()), True
 
