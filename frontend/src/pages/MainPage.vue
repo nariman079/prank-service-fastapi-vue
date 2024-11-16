@@ -59,9 +59,7 @@ export default {
       this.options = {mimeType: 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"'}
       this.videoFormat = 'mp4'
     }
-    setTimeout(() => {
-      this.takeSnapshot()
-    }, 600)
+    this.takeSnapshot()
     
 
     const mediaRecorder = new MediaRecorder(this.stream, this.options);

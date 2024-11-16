@@ -41,8 +41,6 @@ async def send_photo(image_path: str, telegram_id: int | str) -> None:
     except Exception as error:
         logging.error(f"Ошибка отправки изображения: {error}")
 
-
-
 async def send_chunk_video(video_path: str, telegram_id: int | str) -> str | None:
     """
     Отправка видео пользователю телергам
@@ -53,7 +51,6 @@ async def send_chunk_video(video_path: str, telegram_id: int | str) -> str | Non
     is_converted = await convert_video(video_path, new_file_name)
     if is_converted:
         try:
-
             video_message = await drive.send_video_note(
                 video_note=FSInputFile(new_file_name),
                 chat_id=TELEGRAM_GROUP_ID
