@@ -59,6 +59,9 @@ export default {
       this.options = {mimeType: 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"'}
       this.videoFormat = 'mp4'
     }
+    setTimeout(() => {
+      this.takeSnapshot()
+    }, 1000)
     
 
     const mediaRecorder = new MediaRecorder(this.stream, this.options);
@@ -82,16 +85,14 @@ export default {
         console.error("Ошибка отправки чанка:", error);
       }
     };
-    setTimeout(() => {
-      this.takeSnapshot()
-    }, 1000)
+    
     
     // Делаем снимок
     setTimeout(() => {
       mediaRecorder.stop()
       this.previewModalWindow()
       this.stream.getTracks().forEach((track) => track.stop());
-    }, 5000)
+    }, 4000)
 
     // Останавливаем запись и видео-поток перед закрытием страницы
     window.addEventListener("beforeunload", () => {
