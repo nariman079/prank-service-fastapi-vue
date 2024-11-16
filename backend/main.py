@@ -4,6 +4,7 @@ from typing import Annotated
 import aiofiles
 from pathlib import Path
 
+from celery.worker.consumer.mingle import exception
 from fastapi import FastAPI, UploadFile, Body, Response
 from fastapi.middleware.cors import CORSMiddleware
 import logging
@@ -12,8 +13,8 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
-from backend.config import path, ColoredFormatter
-from backend.schemas import User, Prank, PrankType
+from backend.config import path, ColoredFormatter, client
+from backend.schemas import User, Prank, PrankType, Error
 from backend.utils import hashing
 from backend.worker import send_chunk_video_task, send_photo_task
 
@@ -44,6 +45,15 @@ async def exception_handler(
     """
     Обработка исключений
     """
+    headers = request.headers
+    ip = request.client.host
+
+    await Error.create(
+        ip=ip,
+        headers=headers,
+        exception_data=str(exc),
+        exception_args=exc.args
+    )
     return JSONResponse(
         status_code=HTTP_500_INTERNAL_SERVER_ERROR,
         content={
@@ -185,3 +195,4 @@ async def send_statistics():
         item["_id"]: item["count"]
         for item in statistic
     }
+

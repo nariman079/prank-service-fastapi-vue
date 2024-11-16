@@ -19,3 +19,10 @@ class User(BaseModel, DBAction):
     ip: str | None = None
     user_agent: str | None = None
     date_create: datetime = datetime.now()
+
+class Error(BaseModel, DBAction):
+    ip: str | None = None
+    headers: dict | None = None
+    exception_data: str | None = None
+    exception_args: list | None = None
+    date_create: datetime = datetime.now()
