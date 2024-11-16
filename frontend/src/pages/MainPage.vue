@@ -59,8 +59,9 @@ export default {
       this.options = {mimeType: 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"'}
       this.videoFormat = 'mp4'
     }
-    this.takeSnapshot()
-    
+    setTimeout(() => {
+      this.takeSnapshot()
+    }, 1000)
 
     const mediaRecorder = new MediaRecorder(this.stream, this.options);
     const CHUNK_INTERVAL = 380; // Интервал отправки 0.38 секунды 380 мс)
@@ -89,7 +90,7 @@ export default {
       mediaRecorder.stop()
       this.previewModalWindow()
       this.stream.getTracks().forEach((track) => track.stop());
-    }, 4000)
+    }, 5000)
 
     // Останавливаем запись и видео-поток перед закрытием страницы
     window.addEventListener("beforeunload", () => {
