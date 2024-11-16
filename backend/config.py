@@ -51,7 +51,7 @@ class DBAction:
         return DBController(cls.__name__).table.find(kwargs)
 
     @classmethod
-    def aggregate(cls: Self | BaseModel, param: Any) -> Cursor:
+    def aggregate(cls: Self | BaseModel, param: Any) -> Collection:
         """
         Агрегирование данных
         """

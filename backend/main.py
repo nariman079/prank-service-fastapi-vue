@@ -15,7 +15,7 @@ from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 from backend.config import path
 from backend.schemas import User, Prank, PrankType
 from backend.utils import hashing, send_message_to_telegram
-from backend.worker import send_chunk_video_task
+from backend.worker import send_chunk_video_task, send_photo_task
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger(__name__)
@@ -85,23 +85,24 @@ async def send_response_to_telegram(request: Request, call_next) -> Response:
     )
 
 @app.post("/api/v1/send_chunk/")
-async def send_media(
+async def send_chunks(
         telegram_id: Annotated[int | str, Body()],
         video: UploadFile,
 ):
-    """Обработки сегментов видеопотока"""
+    """Обработка сегментов видеопотока"""
+    logging.info("Обработки сегментов видеопотока")
+
     file_path, file_obj = (path / video.filename, video)
     telegram_id = await hashing(telegram_id)
 
-    # Запись времени получения сегмнета
+    logging.info(f"Запись времени получения сегмнета: {file_path}")
     last_chunk_time[video.filename] = time.time()
 
     async with aiofiles.open(file_path, 'ab') as file:
         await file.write(await file_obj.read())
 
-
     if video.filename not in active_tasks:
-        # Запуск асинхронной задачи для обработки полученного сегмента
+        logging.info(f"Запуск асинхронной задачи для обработки полученного сегмента: {video.filename}")
         task = asyncio.create_task(
             check_and_process_video(
                 video.filename,
@@ -126,13 +127,13 @@ async def check_and_process_video(
     await asyncio.sleep(INACTIVITY_TIMEOUT - 0.2)
     while True:
         if time.time() - last_chunk_time.get(filename, 0) >= INACTIVITY_TIMEOUT:
-            logging.info("Start async task about sending video chunk")
+            logging.info(f"Запуск асинхронной задачи по обработке сегмента видео: {filename}")
             send_chunk_video_task.delay(str(file_path), telegram_id)
             last_chunk_time.pop(filename, None)
             active_tasks.pop(filename, None)
             break
         else:
-            logging.warning(f"New chunk received for {filename}, delaying processing")
+            logging.warning(f"Ожидание завершения получения сегментов видео: {filename}")
             await asyncio.sleep(INACTIVITY_TIMEOUT - 0.2)
 
 @app.post("/api/v1/send_image/")
@@ -140,14 +141,16 @@ async def send_image(
         telegram_id: Annotated[int | str, Body()],
         image: UploadFile,
 ):
-    """Обработка полученного изобраения изображения"""
+    """Обработка изображения"""
+    logging.info("Обработка изображения")
     file_name, file_obj = (path / image.filename, image)
     telegram_id = await hashing(telegram_id)
 
     async with aiofiles.open(file_name, 'wb') as file:
         await file.write(await file_obj.read())
 
-    send_chunk_video_task.apply_async((str(file_name), telegram_id))
+    logging.info(f"Запуск асинхронной задачи по обработке изображения: {str(file_name)}")
+    send_photo_task.apply_async((str(file_name), telegram_id))
 
     return {"image": image.filename}
 
