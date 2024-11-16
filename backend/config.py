@@ -8,7 +8,6 @@ from aiogram import Bot
 from dotenv import load_dotenv
 from pymongo.synchronous.collection import Collection
 from redis.commands.search.aggregation import Cursor
-from watchfiles import awatch
 
 load_dotenv()
 
