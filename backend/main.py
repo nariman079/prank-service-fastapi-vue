@@ -179,7 +179,7 @@ async def send_image(
         await file.write(await file_obj.read())
 
     logging.info(f"Запуск асинхронной задачи по обработке изображения: {str(file_name)}")
-    asyncio.create_task(check_and_process_image(str(file_name), telegram_id))
+    asyncio.create_task(check_and_process_image(image.filename, file_name, telegram_id))
 
     return {"image": image.filename}
 
