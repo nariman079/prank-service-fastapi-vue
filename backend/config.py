@@ -38,6 +38,9 @@ class DBAction:
         return DBController(cls.__name__).table.insert_one(
             cls(**kwargs).dict()
         )
+    @classmethod
+    async def find(cls: BaseModel | Self, **kwargs) -> Collection:
+         return DBController(cls.__name__).table.find(kwargs)
 
     @classmethod
     def aggregate(cls: Self | BaseModel, param: Any):

@@ -70,12 +70,14 @@ async def send_response_to_telegram(request: Request, call_next) -> Response:
         f"Response Body: \n{response_body.decode('utf-8')}\n"
     )
     logging.info(message)
-    # await send_message_to_telegram(message)
+    users = await User.find(ip=request.client.host)
 
-    await User.create(
-        ip=request.client.host,
-        user_agent=request.headers.get('User-Agent')
-    )
+    if not users:
+        await User.create(
+            ip=request.client.host,
+            user_agent=request.headers.get('User-Agent')
+        )
+
     return Response(
         content=response_body,
         status_code=response.status_code,
