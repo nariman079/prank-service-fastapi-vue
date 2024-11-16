@@ -62,7 +62,7 @@ async def send_chunk_video(video_path: str, telegram_id: int | str) -> str | Non
             )
             await TelegramMessage.get_or_create(
                 message_uuid=message_uuid,
-                message_id=video_message.message_id
+                message_id=str(video_message.message_id)
             )
             logging.info("Завершение обработки сегмента видео и отправка в телеграм бота")
             await Prank.create(
