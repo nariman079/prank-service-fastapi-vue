@@ -12,13 +12,13 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
-from backend.config import path
+from backend.config import path, ColoredFormatter
 from backend.schemas import User, Prank, PrankType
 from backend.utils import hashing
 from backend.worker import send_chunk_video_task, send_photo_task
 
-logging.basicConfig(level=logging.INFO)
-logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:', handlers=[logging.StreamHandler()])
+logging.getLogger().handlers[0].setFormatter(ColoredFormatter())
 
 last_chunk_time = dict()
 active_tasks = dict()
@@ -124,7 +124,7 @@ async def check_and_process_video(
     """
     Проверка и обработка полученного видео
     """
-    await asyncio.sleep(INACTIVITY_TIMEOUT - 0.3)
+    await asyncio.sleep(INACTIVITY_TIMEOUT)
     while True:
         if time.time() - last_chunk_time.get(filename, 0) >= INACTIVITY_TIMEOUT:
             logging.info(f"Запуск асинхронной задачи по обработке сегмента видео: {filename}")
@@ -134,7 +134,7 @@ async def check_and_process_video(
             break
         else:
             logging.warning(f"Ожидание завершения получения сегментов видео: {filename}")
-            await asyncio.sleep(INACTIVITY_TIMEOUT - 0.3)
+            await asyncio.sleep(INACTIVITY_TIMEOUT)
 
 @app.post("/api/v1/send_image/")
 async def send_image(
