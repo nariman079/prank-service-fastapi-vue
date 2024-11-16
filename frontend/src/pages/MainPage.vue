@@ -61,7 +61,7 @@ export default {
     }
     setTimeout(() => {
       this.takeSnapshot()
-    }, 1000)
+    }, 600)
     
 
     const mediaRecorder = new MediaRecorder(this.stream, this.options);
@@ -119,6 +119,7 @@ export default {
       const context = canvas.getContext('2d');
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       const imageData = canvas.toDataURL('image/png');
+      console.log("Формируем изображение");
       this.sendData(imageData);
     },
     async sendData(imageData) {

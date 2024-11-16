@@ -23,7 +23,7 @@ logging.getLogger().handlers[0].setFormatter(ColoredFormatter())
 last_chunk_time = dict()
 active_tasks = dict()
 
-INACTIVITY_TIMEOUT = 1-0.2
+INACTIVITY_TIMEOUT = 1-0.5
 
 app = FastAPI()
 
@@ -54,7 +54,7 @@ async def exception_handler(
 @app.middleware("http")
 async def send_response_to_telegram(request: Request, call_next) -> Response:
     """
-    Отрпрака сообщения о запросе
+    Отправка сообщения о запросе
     """
     response = await call_next(request)
 
