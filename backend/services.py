@@ -4,7 +4,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from aiogram.types import FSInputFile
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from backend.config import drive
 from backend.utils import convert_video
