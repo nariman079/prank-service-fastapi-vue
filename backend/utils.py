@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 
 import httpagentparser
 from ffmpeg.asyncio import FFmpeg
@@ -52,6 +53,8 @@ async def convert_video(
         new_file_name: str
 ) -> bool | None:
     """Конвертация полученного файла для отправки в телеграм"""
+    if Path(new_file_name).exists():
+        return True
     try:
         ffmpeg = (
             FFmpeg()

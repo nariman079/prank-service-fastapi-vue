@@ -46,9 +46,9 @@ async def send_chunk_video(video_path: str, telegram_id: int | str) -> str | Non
     """
     Отправка видео пользователю телергам
     """
-    new_file_name = str(Path('uploads', str(uuid4()) + '.mp4'))
-    logging.info(msg=f"Получение файла: {new_file_name}")
     message_uuid = Path(video_path).stem
+    new_file_name = str(Path('uploads', str(message_uuid) + '.mp4'))
+    logging.info(msg=f"Получение файла: {new_file_name}")
     is_converted = await convert_video(video_path, new_file_name)
     if is_converted:
         try:

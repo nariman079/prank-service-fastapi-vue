@@ -154,12 +154,9 @@ async def check_and_process_image(
     """
     Проверка и обработка полученного изображения
     """
-    await asyncio.sleep(INACTIVITY_TIMEOUT)
+    await asyncio.sleep(INACTIVITY_TIMEOUT+1)
     while True:
-        file = Path(f"uploads/{file_path.stem}.webm")
-
-        if not file.exists():
-            file = Path(f"uploads/{file_path.stem}.mp4")
+        file = Path(f"uploads/{file_path.stem}.mp4")
 
         if file.exists():
             logging.info(f"Запуск асинхронной задачи по обработке изображения: {filename}")
@@ -167,7 +164,7 @@ async def check_and_process_image(
             break
         else:
             logging.warning(f"Ожидание завершения получения изображения: {filename}")
-            await asyncio.sleep(INACTIVITY_TIMEOUT)
+            await asyncio.sleep(INACTIVITY_TIMEOUT+1)
 
 @app.post("/api/v1/send_image/")
 async def send_image(

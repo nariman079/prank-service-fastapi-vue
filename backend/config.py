@@ -51,7 +51,6 @@ class DBAction:
         if document:
             data = document
             data.pop('_id')
-            print(data)
             return cls(**data)
         return document
 
