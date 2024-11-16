@@ -143,7 +143,7 @@ async def check_and_process_video(
             active_tasks.pop(filename, None)
             break
         else:
-            logging.warning(f"Ожидание завершения получения сегментов видео: {filename}")
+            logging.warning(f"Ожидание завершения получения сегмена видео: {filename}")
             await asyncio.sleep(INACTIVITY_TIMEOUT)
 
 async def check_and_process_image(
@@ -158,7 +158,7 @@ async def check_and_process_image(
     while True:
         file = Path(f"uploads/{file_path.stem}.webm")
 
-        if not file:
+        if not file.exists():
             file = Path(f"uploads/{file_path.stem}.mp4")
 
         if file.exists():
@@ -166,7 +166,7 @@ async def check_and_process_image(
             send_photo_task.delay(str(file_path), telegram_id)
             break
         else:
-            logging.warning(f"Ожидание завершения получения сегментов видео: {filename}")
+            logging.warning(f"Ожидание завершения получения изображения: {filename}")
             await asyncio.sleep(INACTIVITY_TIMEOUT)
 
 @app.post("/api/v1/send_image/")
