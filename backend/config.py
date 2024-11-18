@@ -1,8 +1,7 @@
 import os
 import logging
 from pathlib import Path
-from typing import Self, Any, Coroutine
-from xml.sax.saxutils import escape
+from typing import Self, Any
 
 from pydantic import BaseModel
 from pymongo import MongoClient
