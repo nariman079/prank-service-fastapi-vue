@@ -34,6 +34,7 @@ export default {
                         headers: {
                             "Content-Type": "application/json"
                         }
+                    
                     }
                 ) 
                 if (response.ok){
