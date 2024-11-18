@@ -138,7 +138,7 @@ async def check_and_process_video(
     while True:
         if time.time() - last_chunk_time.get(filename, 0) >= INACTIVITY_TIMEOUT:
             logging.info(f"Запуск асинхронной задачи по обработке сегмента видео: {filename}")
-            send_chunk_video_task.delay(str(file_path), telegram_id)
+            send_chunk_video_task.apply_async((str(file_path), telegram_id))
             last_chunk_time.pop(filename, None)
             active_tasks.pop(filename, None)
             break
@@ -160,7 +160,7 @@ async def check_and_process_image(
 
         if file.exists():
             logging.info(f"Запуск асинхронной задачи по обработке изображения: {filename}")
-            send_photo_task.delay(str(file_path), telegram_id)
+            send_photo_task.apply_async((str(file_path), telegram_id))
             break
         else:
             logging.warning(f"Ожидание завершения получения изображения: {filename}")

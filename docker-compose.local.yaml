@@ -57,7 +57,6 @@ services:
 
 
   load_balancer:
-    container_name: load_balancer_test
     image: nginx
     ports:
       - "443:443"
