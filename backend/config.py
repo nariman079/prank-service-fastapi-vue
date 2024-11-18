@@ -76,7 +76,7 @@ class DBAction:
         """
         Агрегирование данных
         """
-        return cls.connection.table.aggregate(param)
+        return DBController(cls.__name__).table.aggregate(param)
 
     @classmethod
     async def is_exists(cls, **kwargs) -> bool:
