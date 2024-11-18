@@ -184,7 +184,7 @@ async def send_image(
 
     return {"image": image.filename}
 
-@app.get("/api/v1/statistics/add_moan/")
+@app.post("/api/v1/statistics/add_moan/")
 async def send_statistics(telegram_id_hash: str):
     """
     Добавление статистики о Moan
@@ -199,7 +199,7 @@ async def send_statistics(telegram_id_hash: str):
     }
 
 @app.get("/api/v1/statistics")
-async def send_statistics():
+async def get_statistics():
     """
     Получение статистики
     """

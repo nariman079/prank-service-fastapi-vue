@@ -9,7 +9,6 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
 
-
   mongo-express:
     image: mongo-express
     restart: always
@@ -21,7 +20,6 @@ services:
       ME_CONFIG_MONGODB_SERVER: mongo
     depends_on:
       - mongo
-
 
   cache:
     image: 'redis:alpine'
@@ -36,8 +34,6 @@ services:
       - ./:/app
       - uploads:/app/uploads
     restart: unless-stopped
-    ports:
-      - "8000:8000"
     environment:
       - REDIS_HOST=redis://localhost:6379
     depends_on:
@@ -46,7 +42,6 @@ services:
     network_mode: 'host'
 
   celery:
-    container_name: async_tasks
     build: .
     command: poetry run celery -A backend.worker worker -l info
     restart: unless-stopped
@@ -70,7 +65,9 @@ services:
     volumes:
       - ./nginx/nginx.local.conf:/etc/nginx/nginx.conf
       - ./nginx/tiktok.conf:/etc/nginx/conf.d/tiktok.conf
+      - ./nginx/moan.conf:/etc/nginx/conf.d/moan.conf
       - ./frontend/dist:/app/tiktok
+      - ./ston_frontend/dist:/app/moan
       - /etc/letsencrypt:/etc/letsencrypt/
     depends_on:
       - backend

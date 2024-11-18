@@ -21,34 +21,36 @@ export default {
             return {
                 timerCount: 60,
                 isPranked: true,
-                mainAudio: new Audio(require("@/assets/sounc.mp3"))
+                mainAudio: new Audio(require("@/assets/sounc.mp3")),
+                baseUrl: "https://tiktok.copicon.ru/api/v1/statistics/add_moan/?telegram_id_hash=" + this.$route.params.telegram_hash
             }
         },
         methods: {
             async sendStatistic(){
-                await fetch(
-                    "localhost:8080/api/statistics/",
+                const response = await fetch(
+                    this.baseUrl,
                     {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(
-                            {
-                                type: 'stoneapp'
-                            }
-                        )
+                        }
                     }
                 ) 
+                if (response.ok){
+                    console.log("added statistic")
+                }else{
+                    console.log("error: ", response.json())
+                }
+                 
             },
             playSound(){
                 this.mainAudio.addEventListener('ended', ()=>{
                     this.mainAudio.currentTime = 0
-                    this.mainAudio.play()
+                    // this.mainAudio.play()
                 }, false)
                 this.isPranked = false
-                this.mainAudio.play()
-                sendStatistic()
+                // this.mainAudio.play()
+                this.sendStatistic()
             }
         },
         watch: {

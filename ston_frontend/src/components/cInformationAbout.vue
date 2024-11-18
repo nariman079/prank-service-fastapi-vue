@@ -1,6 +1,6 @@
 <template>
     <div class="info-block">
-        <img src="@/assets/img/result_prank.png" alt="">
+        <img src="@/assets/result_prank.png" alt="">
         <h1>Вас пранканули с помошью телеграм бота @WallPrankBot</h1>
         <h3>Вы сели на подушку пердушку </h3>
         <a :href="prankBotURL">Попробывать также</a>
