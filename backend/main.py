@@ -191,7 +191,7 @@ async def send_statistics(telegram_id_hash: str | int):
     """
     telegram_id = await hashing(telegram_id_hash)
     await Prank.create(
-        telegram_id=telegram_id,
+        telegram_id=str(telegram_id),
         prank_type=PrankType.moan
     )
     return {
