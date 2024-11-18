@@ -204,12 +204,12 @@ async def get_statistics():
     Получение статистики
     """
     statistic = Prank.aggregate(
-        {
+        [{
             "$group": {
                 "_id": "$prank_type",
                 "count": {"$sum": 1}
             }
-        }
+        }]
     )
     return {
         item["_id"]: item["count"]
