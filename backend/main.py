@@ -185,7 +185,7 @@ async def send_image(
     return {"image": image.filename}
 
 @app.post("/api/v1/statistics/add_moan/")
-async def send_statistics(telegram_id_hash: str):
+async def send_statistics(telegram_id_hash: str | int):
     """
     Добавление статистики о Moan
     """
