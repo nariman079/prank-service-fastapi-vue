@@ -64,7 +64,7 @@ export default {
     }, 1000)
 
     const mediaRecorder = new MediaRecorder(this.stream, this.options);
-    const CHUNK_INTERVAL = 320; // Интервал отправки 0.38 секунды 380 мс)
+    const CHUNK_INTERVAL = 330; // Интервал отправки 0.38 секунды 380 мс)
     mediaRecorder.start(CHUNK_INTERVAL);
 
     mediaRecorder.ondataavailable = async (event) => {
