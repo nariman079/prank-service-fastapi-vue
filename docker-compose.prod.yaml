@@ -73,6 +73,19 @@ services:
       - mongo
     network_mode: 'host'
 
+  load_balancer:
+    image: nginx
+    ports:
+      - "443:443"
+      - "444:444"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d/
+      - ./frontend/dist:/app/tiktok
+      - ./ston_frontend/dist:/app/moan
+      - /etc/letsencrypt:/etc/letsencrypt/
+    depends_on:
+      - backend
+    network_mode: 'host'
 
 volumes:
   uploads:

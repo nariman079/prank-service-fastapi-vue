@@ -20,6 +20,7 @@ TELEGRAM_GROUP_ID = os.getenv('TELEGRAM_GROUP_ID', -4575472838)
 path = Path('uploads')
 drive = Bot(TOKEN)
 
+
 last_chunk_time = dict()
 active_tasks = dict()
 
