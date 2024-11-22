@@ -1,7 +1,6 @@
-import asyncio
 import logging
+import os
 from pathlib import Path
-from uuid import uuid4
 
 from aiogram.types import FSInputFile
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -9,6 +8,17 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from backend.config import drive, TELEGRAM_GROUP_ID
 from backend.utils import convert_video
 from backend.schemas import Prank, PrankType, TelegramMessage
+
+
+async def delete_file(filepath: str) -> bool | None:
+    """Удаление файла"""
+    try:
+        os.remove(filepath)
+        logging.info(f"Удаление файла: {filepath}")
+        return True
+    except Exception as exec:
+        logging.error(f"Ошибка удаления файла {exec}")
+        return False
 
 
 async def send_photo(image_path: str, telegram_id: int | str) -> None:
@@ -39,6 +49,9 @@ async def send_photo(image_path: str, telegram_id: int | str) -> None:
                 prank_type=PrankType.photo
             )
             logging.info(f"Запись статистики: {PrankType.photo}")
+
+            await delete_file(image_path)
+
         except Exception as error:
             logging.error(f"Ошибка отправки изображения: {error}")
 

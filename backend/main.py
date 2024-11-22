@@ -25,6 +25,7 @@ last_chunk_time = dict()
 active_tasks = dict()
 
 INACTIVITY_TIMEOUT = 2
+ATTEMPT = 10
 
 app = FastAPI()
 
@@ -155,6 +156,7 @@ async def check_and_process_image(
     Проверка и обработка полученного изображения
     """
     await asyncio.sleep(INACTIVITY_TIMEOUT+1)
+    current_attempt = 0
     while True:
         file = Path(f"uploads/{file_path.stem}.mp4")
 
@@ -164,6 +166,12 @@ async def check_and_process_image(
             break
         else:
             logging.warning(f"Ожидание завершения получения изображения: {filename}")
+
+            # Завершение цикла когда совершено 10 попыток найти изображение
+            current_attempt += 1
+            if current_attempt >= ATTEMPT:
+                break
+
             await asyncio.sleep(INACTIVITY_TIMEOUT+1)
 
 @app.post("/api/v1/send_image/")
