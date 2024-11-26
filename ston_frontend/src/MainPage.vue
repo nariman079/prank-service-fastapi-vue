@@ -47,10 +47,10 @@ export default {
             playSound(){
                 this.mainAudio.addEventListener('ended', ()=>{
                     this.mainAudio.currentTime = 0
-                    // this.mainAudio.play()
+                    this.mainAudio.play()
                 }, false)
                 this.isPranked = false
-                // this.mainAudio.play()
+                this.mainAudio.play()
                 this.sendStatistic()
             }
         },
