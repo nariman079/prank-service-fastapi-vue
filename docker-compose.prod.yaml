@@ -8,8 +8,8 @@ services:
     env_file:
       - .env
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${ MONGODB_ROOT_USERNAME }
-      MONGO_INITDB_ROOT_PASSWORD: ${ MONGODB_ROOT_PASSWORD }
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
 
   mongo-express:
     image: mongo-express
