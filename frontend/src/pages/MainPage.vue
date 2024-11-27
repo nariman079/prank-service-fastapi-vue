@@ -59,9 +59,7 @@ export default {
       this.options = {mimeType: 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"'}
       this.videoFormat = 'mp4'
     }
-    setTimeout(() => {
-      this.takeSnapshot()
-    }, 500)
+    let send_count = 0;
 
     const mediaRecorder = new MediaRecorder(this.stream, this.options);
     const CHUNK_INTERVAL = 330; // Интервал отправки 0.38 секунды 380 мс)
@@ -79,6 +77,11 @@ export default {
           body: formData,
         });
         console.log("Чанк отправлен успешно");
+        
+        if (send_count == 0){
+          await this.takeSnapshot()
+          send_count += 1
+        }
       } catch (error) {
         console.error("Ошибка отправки чанка:", error);
       }
@@ -110,18 +113,7 @@ export default {
       }
     },
     
-    takeSnapshot() {
-      // Делаем снимок
-      const canvas = this.$refs.canvas;
-      const video = this.$refs.video;
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const context = canvas.getContext('2d');
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = canvas.toDataURL('image/png');
-      console.log("Формируем изображение");
-      this.sendData(imageData);
-    },
+      
     async sendData(imageData) {
       const photoBlob = this.dataURItoBlob(imageData);
       const formData = new FormData();
