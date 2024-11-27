@@ -79,13 +79,17 @@ services:
       - "443:443"
       - "444:444"
     volumes:
-      - ./nginx:/etc/nginx/conf.d/
+      - ./nginx:/etc/nginx/conf.d
       - ./frontend/dist:/app/tiktok
       - ./ston_frontend/dist:/app/moan
-      - /etc/letsencrypt:/etc/letsencrypt/
+      - /etc/letsencrypt:/etc/letsencrypt
     depends_on:
       - backend
     network_mode: 'host'
+
+networks:
+  net:
+    driver: bridge
 
 volumes:
   uploads:
@@ -500,6 +504,3 @@ volumes:
       - backend
     network_mode: 'host'
 
-networks:
-  net:
-    driver: bridge
