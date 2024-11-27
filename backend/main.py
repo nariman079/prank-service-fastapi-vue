@@ -13,7 +13,7 @@ from starlette.responses import JSONResponse
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
 from backend.config import path, ColoredFormatter
-from backend.schemas import User, Prank, PrankType, Error
+from backend.schemas import User, Prank, PrankType, Error, TelegramMessage
 from backend.utils import hashing
 from backend.worker import send_chunk_video_task, send_photo_task
 
@@ -160,15 +160,20 @@ async def check_and_process_image(
         file = Path(f"uploads/{file_path.stem}.mp4")
 
         if file.exists():
-            logging.info(f"Запуск асинхронной задачи по обработке изображения: {filename}")
-            send_photo_task.apply_async((str(file_path), telegram_id))
-            break
+            telegram_message = await TelegramMessage.get(message_uuid=file_path.stem)
+            if telegram_message:
+                logging.info(f"Запуск асинхронной задачи по обработке изображения: {filename}")
+                send_photo_task.apply_async((str(file_path), telegram_id))
+                break
+            else:
+                await asyncio.sleep(INACTIVITY_TIMEOUT + 1)
         else:
             logging.warning(f"Ожидание завершения получения изображения: {filename}")
 
             # Завершение цикла когда совершено 10 попыток найти изображение
             current_attempt += 1
             if current_attempt >= ATTEMPT:
+
                 break
 
             await asyncio.sleep(INACTIVITY_TIMEOUT+1)
