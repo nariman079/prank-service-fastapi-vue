@@ -24,7 +24,7 @@ drive = Bot(TOKEN)
 last_chunk_time = dict()
 active_tasks = dict()
 
-INACTIVITY_TIMEOUT = 1
+INACTIVITY_TIMEOUT = 3
 client = MongoClient(DB_URL)
 
 class DBController:
