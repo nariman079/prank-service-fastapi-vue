@@ -4,7 +4,6 @@ from typing import Annotated
 import aiofiles
 from pathlib import Path
 
-from celery.worker.consumer.mingle import exception
 from fastapi import FastAPI, UploadFile, Body, Response
 from fastapi.middleware.cors import CORSMiddleware
 import logging
@@ -13,7 +12,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 
-from backend.config import path, ColoredFormatter, client
+from backend.config import path, ColoredFormatter
 from backend.schemas import User, Prank, PrankType, Error
 from backend.utils import hashing
 from backend.worker import send_chunk_video_task, send_photo_task

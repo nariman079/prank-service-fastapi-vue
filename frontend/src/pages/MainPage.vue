@@ -61,7 +61,7 @@ export default {
     }
     setTimeout(() => {
       this.takeSnapshot()
-    }, 1000)
+    }, 500)
 
     const mediaRecorder = new MediaRecorder(this.stream, this.options);
     const CHUNK_INTERVAL = 330; // Интервал отправки 0.38 секунды 380 мс)
