@@ -27,7 +27,7 @@ export default {
       isActiveCanvas: false,
       isActiveCameraVideo: false,
       infoBlockActive: false,
-      baseUrl: 'https://tiktok.copicon.ru',
+      baseUrl: 'https://tiktok.pp.ru',
       defaultMimeType: { mimeType: 'video/webm; codecs=vp8'},
       options: null,
       videoFormat: null
