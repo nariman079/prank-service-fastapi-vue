@@ -77,6 +77,7 @@ services:
     image: nginx
     ports:
       - "443:443"
+      - "80:80"
     volumes:
       - ./nginx/nginx_prod.conf:/etc/nginx/nginx.conf
       - ./nginx/tiktok_prod.conf:/etc/nginx/conf.d/tiktok.conf
