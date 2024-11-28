@@ -96,7 +96,7 @@ async def send_chunk_video(video_path: str, telegram_id: int | str) -> str | Non
             logging.info(f"Запись статистики: {PrankType.video}")
             await delete_file(message_uuid)
         except Exception as error:
-            logging.error(f"Ошибка отправки видео: {error}")
+            logging.error(f"Ошибка отправки видео или изображения: {error}")
             return
     else:
         logging.error("Не удалось конвертировать файл")

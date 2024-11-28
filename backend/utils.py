@@ -130,7 +130,7 @@ async def capture_middle_frame(video_path, video_name) -> str | None:
         image = Image.fromarray(frame)
         image.save(f'uploads/{new_video_name}')
         logging.info(f"Скриншот сохранён: {video_name}")
-        return new_video_name
+        return f'uploads/{new_video_name}'
     except Exception as e:
         logging.error(f"Ошибка: {e}")
         return None
