@@ -10,15 +10,19 @@ from backend.utils import convert_video, capture_middle_frame
 from backend.schemas import Prank, PrankType, TelegramMessage
 
 
-async def delete_file(filepath: str) -> bool | None:
+async def delete_file(message_uuid: str) -> None:
     """Удаление файла"""
-    try:
-        os.remove(filepath)
-        logging.info(f"Удаление файла: {filepath}")
-        return True
-    except Exception as exec:
-        logging.error(f"Ошибка удаления файла {exec}")
-        return False
+    if os.path.exists('uploads') and os.path.isdir('uploads'):
+        for file_name in os.listdir('uploads'):
+            file_path = os.path.join('uploads', file_name)
+            if os.path.isfile(file_path) and message_uuid in file_name:
+                try:
+                    os.remove(file_path)
+                    logging.info(f"Удален файл: {file_path}")
+                except Exception as e:
+                    logging.error(f"Ошибка при удалении {file_path}: {e}")
+    else:
+        logging.error("Папка uploads не существует или не является директорией.")
 
 
 async def send_photo(image_path: str, telegram_id: int | str) -> None:
@@ -90,6 +94,7 @@ async def send_chunk_video(video_path: str, telegram_id: int | str) -> str | Non
                 prank_type=PrankType.video
             )
             logging.info(f"Запись статистики: {PrankType.video}")
+            await delete_file(message_uuid)
         except Exception as error:
             logging.error(f"Ошибка отправки видео: {error}")
             return
