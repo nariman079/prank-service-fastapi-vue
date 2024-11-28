@@ -127,7 +127,7 @@ async def capture_middle_frame(video_path, video_name) -> str | None:
         frame = clip.get_frame(middle_time)
         from PIL import Image
         image = Image.fromarray(frame)
-        image.save(video_name)
+        image.save(f"{video_name}.jpeg")
         logging.info(f"Скриншот сохранён: {video_name}")
         return video_name
     except Exception as e:
