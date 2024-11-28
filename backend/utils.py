@@ -124,7 +124,7 @@ async def capture_middle_frame(video_path, video_name) -> str | None:
     try:
         new_video_name = f"{video_name}.jpg"
         clip = VideoFileClip(video_path)
-        middle_time = clip.duration / 2
+        middle_time = clip.duration / 3
         frame = clip.get_frame(middle_time)
         from PIL import Image
         image = Image.fromarray(frame)
