@@ -6,7 +6,7 @@ from aiogram.types import FSInputFile
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from backend.config import drive, TELEGRAM_GROUP_ID
-from backend.utils import convert_video
+from backend.utils import convert_video, capture_middle_frame
 from backend.schemas import Prank, PrankType, TelegramMessage
 
 
@@ -69,11 +69,22 @@ async def send_chunk_video(video_path: str, telegram_id: int | str) -> str | Non
                 video_note=FSInputFile(new_file_name),
                 chat_id=TELEGRAM_GROUP_ID
             )
-            await TelegramMessage.get_or_create(
-                message_uuid=message_uuid,
-                message_id=str(video_message.message_id)
-            )
             logging.info("Завершение обработки сегмента видео и отправка в телеграм бота")
+            new_image_path = await capture_middle_frame(new_file_name, message_uuid)
+
+            await drive.send_photo(
+                chat_id=telegram_id,
+                photo=FSInputFile(new_image_path),
+                reply_markup=InlineKeyboardMarkup(
+                    inline_keyboard=[
+                        [InlineKeyboardButton(
+                            callback_data=f"video_message_id:{video_message.message_id}",
+                            text="Посмотреть видео"
+                        )]
+                    ]
+                )
+            )
+            logging.info("Завершение обработки изображения  и отправка в телеграм пользователя")
             await Prank.create(
                 telegram_id=str(telegram_id),
                 prank_type=PrankType.video

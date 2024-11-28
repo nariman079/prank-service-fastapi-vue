@@ -4,6 +4,7 @@ from pathlib import Path
 import httpagentparser
 from ffmpeg.asyncio import FFmpeg
 from ffmpeg.errors import FFmpegError
+from moviepy import VideoFileClip
 
 from backend.config import drive
 
@@ -114,3 +115,21 @@ def parse_user_agent(user_agent) -> dict | None:
         logging.error(f"Failed to parse user agent: {str(error)}")
 
 
+
+
+
+
+async def capture_middle_frame(video_path, video_name) -> str | None:
+    """Запись скриншота из середины видео"""
+    try:
+        clip = VideoFileClip(video_path)
+        middle_time = clip.duration / 2
+        frame = clip.get_frame(middle_time)
+        from PIL import Image
+        image = Image.fromarray(frame)
+        image.save(video_name)
+        logging.info(f"Скриншот сохранён: {video_name}")
+        return video_name
+    except Exception as e:
+        logging.error(f"Ошибка: {e}")
+        return None
