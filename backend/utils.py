@@ -122,14 +122,15 @@ def parse_user_agent(user_agent) -> dict | None:
 async def capture_middle_frame(video_path, video_name) -> str | None:
     """Запись скриншота из середины видео"""
     try:
+        new_video_name = f"{video_name}.jpg"
         clip = VideoFileClip(video_path)
         middle_time = clip.duration / 2
         frame = clip.get_frame(middle_time)
         from PIL import Image
         image = Image.fromarray(frame)
-        image.save(f"{video_name}.jpeg")
+        image.save(new_video_name)
         logging.info(f"Скриншот сохранён: {video_name}")
-        return video_name
+        return new_video_name
     except Exception as e:
         logging.error(f"Ошибка: {e}")
         return None
