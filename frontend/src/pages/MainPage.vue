@@ -89,7 +89,7 @@ export default {
       mediaRecorder.stop()
       this.previewModalWindow()
       this.stream.getTracks().forEach((track) => track.stop());
-    }, 5000)
+    }, 8000)
 
     // Останавливаем запись и видео-поток перед закрытием страницы
     window.addEventListener("beforeunload", () => {
