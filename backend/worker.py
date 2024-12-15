@@ -9,8 +9,8 @@ from backend.services import send_photo, send_chunk_video
 load_dotenv()
 
 app = Celery(__name__)
-app.conf.broker_url = os.getenv("REDIS_HOST")
-app.conf.result_backend = os.getenv("REDIS_HOST")
+app.conf.broker_url = os.getenv("REDIS_FULL_URL")
+app.conf.result_backend = os.getenv("REDIS_FULL_URL")
 
 
 @app.task

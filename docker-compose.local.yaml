@@ -8,16 +8,15 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
-
+    network_mode: "host"
+  
   mongo-express:
     image: mongo-express
     restart: always
     ports:
       - "8081:8081"
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: password
-      ME_CONFIG_MONGODB_SERVER: mongo
+    env_file:
+      - .env
     depends_on:
       - mongo
 
@@ -27,6 +26,15 @@ services:
     restart: unless-stopped
     network_mode: 'host'
 
+  video_processor:
+    build: 
+      context: .
+      dockerfile: stream_events.Dockerfile
+    command: sh -c "./stream_events"
+    depends_on:
+      - cache
+    network_mode: 'host'
+  
   backend:
     build: .
     command: poetry run uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
@@ -34,8 +42,8 @@ services:
       - ./:/app
       - uploads:/app/uploads
     restart: unless-stopped
-    environment:
-      - REDIS_HOST=redis://localhost:6379
+    env_file:
+      - .env
     depends_on:
       - cache
       - mongo
@@ -55,21 +63,19 @@ services:
       - mongo
     network_mode: 'host'
 
-
   load_balancer:
     image: nginx
     ports:
       - "443:443"
       - "444:444"
     volumes:
-      - ./nginx/nginx.local.conf:/etc/nginx/nginx.conf
       - ./nginx/tiktok.conf:/etc/nginx/conf.d/tiktok.conf
       - ./nginx/moan.conf:/etc/nginx/conf.d/moan.conf
       - ./frontend/dist:/app/tiktok
       - ./ston_frontend/dist:/app/moan
-      - /etc/letsencrypt:/etc/letsencrypt/
-    depends_on:
-      - backend
+      # - /etc/letsencrypt:/etc/letsencrypt/
+    # depends_on:
+    #   - backend
     network_mode: 'host'
 
 networks:
